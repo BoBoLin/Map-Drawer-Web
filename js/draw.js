@@ -5,34 +5,8 @@ var popup_overlay;
 var features;
 var modify;
 
-var dt = new Date();
-var time = dt.getFullYear() +""+(dt.getMonth()+1) +""+ dt.getDate() +""+dt.getHours() +""+ dt.getMinutes() +""+ dt.getSeconds();
-rand = Math.floor((Math.random() * 100000) + 1);
 $(document).ready(function () {
-    /********* share ***********/
-    console.log(time);
-    var url = "http://140.116.245.84/geo/Drawer_v2/Drawer/drawer.html?" + time+ "" +rand;
-    var text = "geo information to share";
-    $("#shareCustomLogo").jsSocials({
-        url: url,
-        text: text,
-        showLabel: true,
-        showCount: false,
-        shareIn: "popup",
-        shares:
-        [
-            {
-                share: "facebook",
-                logo: "img/fb-logo.png"
-            },
-            {
-                share: "email",
-                logo: "img/mail.png"
-            }
-        ]
-    });
-
-    /********* !share ***********/
+    
     /********* component init ***********/
     $('.ui.accordion').accordion({
         onOpen: function () {
@@ -601,18 +575,48 @@ $(document).ready(function () {
         });
         var string = new ol.format.KML().writeFeatures(features);
         var base64 = btoa(string);
-
+        /*
         $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string + "&type=insert", dataType: 'jsonp', jsonpCallback: 'handler',
             success: function(response) {
                 console.log(response);
             }
-        });
+        });*/
 
       exportKMLElement.href = 'data:application/vnd.google-earth.kml+xml;base64,' + base64;
     }, false);
 
-    $("#shareCustomLogo").on("click", ".jssocials-share", function(){
-        console.log("hello!");
+    /*************** !export KML **************/
+
+    /*************** share **************/
+    //---facebook init----
+    var dt;
+    var time;
+    var rand;
+
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId      : '320240928434373',
+            cookie     : true,
+            xfbml      : true,
+            version    : 'v2.8'
+        });
+        FB.AppEvents.logPageView();   
+    };
+
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+    //---!facebook init----
+
+    document.getElementById('fb_share').onclick = function() {
+        dt = new Date();
+        time = dt.getFullYear() +""+(dt.getMonth()+1) +""+ dt.getDate() +""+dt.getHours() +""+ dt.getMinutes() +""+ dt.getSeconds();
+        rand = Math.floor((Math.random() * 100000) + 1);
+
         var vectorSource = featureOverlay.getSource();
         var features = [];
         vectorSource.forEachFeature(function(feature) {
@@ -621,15 +625,21 @@ $(document).ready(function () {
             features.push(clone);
         });
         var string = new ol.format.KML().writeFeatures(features);
-        var base64 = btoa(string);
+        var url = 'http://140.116.245.84/geo/Drawer_v2/Drawer/drawer.html?' + time + "" +rand;
 
-        $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string + "&type=insert" + "&date_str=" + time + "" + rand, dataType: 'jsonp', jsonpCallback: 'handler',
+        FB.ui({
+            method: 'share',
+            href: url ,
+        }, function(response){});
+
+        $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string + "&type=insert" + "&date_str=" + time+ ""+ rand, dataType: 'jsonp', jsonpCallback: 'handler',
             success: function(response) {
                 console.log(response);
             }
         });
     });
-    /*************** !export KML **************/
+    /*************** !share **************/
+
 
     /*************** import KML *************/
     $("#import-kml").change(function(){
