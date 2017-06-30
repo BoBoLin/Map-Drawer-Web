@@ -638,6 +638,35 @@ $(document).ready(function () {
             }
         });
     };
+
+    $('#emailLink').on('click', function (event) {
+        dt = new Date();
+        time = dt.getFullYear() +""+(dt.getMonth()+1) +""+ dt.getDate() +""+dt.getHours() +""+ dt.getMinutes() +""+ dt.getSeconds();
+        rand = Math.floor((Math.random() * 100000) + 1);
+
+        var vectorSource = featureOverlay.getSource();
+        var features = [];
+        vectorSource.forEachFeature(function(feature) {
+            var clone = feature.clone();
+            clone.setId(feature.getId());  // clone does not set the id
+            clone.getGeometry().transform(ol.proj.get('EPSG:3857'), 'EPSG:4326');
+            features.push(clone);
+        });
+        var string = new ol.format.KML().writeFeatures(features);
+
+        var url = 'http://140.116.245.84/geo/Drawer_v2/Drawer/drawer.html?' + time + "" +rand;
+        event.preventDefault();
+        var email = '';
+        var subject = 'share the geo info';
+        var emailBody = 'url: ' + url;
+        window.location = 'mailto:' + email + '?subject=' + subject + '&body=' + emailBody;
+
+        $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string + "&type=insert" + "&date_str=" + time+ ""+ rand, dataType: 'jsonp', jsonpCallback: 'handler',
+            success: function(response) {
+                console.log(response);
+            }
+        });
+    });
     /*************** !share **************/
 
 
