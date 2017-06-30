@@ -53,18 +53,18 @@
                             <!-- text -->
                             <a class="item" data-tab="two"><img src="img/paint02.png" alt=""></a>
                             <!-- icon -->
-                            <a class="item" data-tab="three"><img src="img/paint03.png" alt=""></a>
+                            <a class="item" data-tab="three"><img src="img/paint04.png" alt=""></a>
                             <!-- arrow -->
-                            <a class="item" data-tab="four"><img src="img/paint04.png" alt=""></a>
+                            <a class="item" data-tab="four"><img src="img/paint03.png" alt=""></a>
                         </div>
                         <div class="ui tab segment" data-tab="one" id="move_map_button"></div>
-                        <!-- text -->
+                        <!-- point -->
                         <div class="ui tab segment" data-tab="two">
-                            <div class="ui form">
+                            <div class="ui form" id="point_menu">
                                 <div class="fields">
                                     <div class="eight wide field">
                                         <label>字體</label>
-                                        <select id="text_size">
+                                        <select id="point_text_size">
                                             <option value="8px">8</option><option value="9px">9</option>
                                             <option value="10px">10</option><option value="11px">11</option>
                                             <option value="12px">12</option><option value="13px">13</option>
@@ -73,55 +73,124 @@
                                     </div>
                                     <div class="eight wide field">
                                         <label>顏色</label>
-                                        <input type='text' id="color_picker" />
+                                        <input type='text' class="color_picker" />
                                     </div>
                                 </div>
                                 <div class="field">
                                     <label>內容</label>
-                                    <textarea name="" id="text_content" rows="3"></textarea>
+                                    <input type='text' id='point_text_content' />
+                                </div>
+                                <div class='fields'>
+                                    <div class='field'>
+                                        <input type='radio' name='point_icon' checked="checked" value='none' tabindex='0'>
+                                        <p>無圖示</p>
+                                    </div>
+                                    <div class='field'>
+                                        <input type='radio' name='point_icon' value='img/marker01.png' tabindex='0'>
+                                        <img class='ui small image' src='img/marker01.png'>
+                                    </div>
+                                    <div class='field'>
+                                        <input type='radio' name='point_icon' value='img/marker02.png' tabindex='0'>
+                                        <img class='ui small image' src='img/marker02.png'>
+                                    </div>
+                                    <div class='field'>
+                                        <input type='radio' name='point_icon' value='img/marker03.png' tabindex='0'>
+                                        <img class='ui small image' src='img/marker03.png'>
+                                    </div>
                                 </div>
                                 <div class="field">
-                                    <label>角度：<span id="text_arc"></span></label>
-                                    <div class="ui brown range"></div>
+                                    <label>角度：<span id="point_text_arc"></span></label>
+                                    <div class="ui brown range" id="point_arc_ranger"></div>
                                 </div>
-                                <button class="ui button" id="text_button">套用</button>
+                                <button class="ui button" id="point_button">套用</button>
                             </div>
                         </div>
-                        <!-- icon -->
+                        <!-- line -->
                         <div class="ui tab segment" data-tab="three">
-                            <div class="ui form" id="icon_menu">
-                                <div class="eight wide field">
-                                    <div class="ui labeled input">
-                                        <div class="ui basic label">名稱</div>
-                                        <input type='text' id="icon_text"/>
+                            <div class="ui form" id="line_menu">
+                                <div class="fields">
+                                    <div class="eight wide field">
+                                        <label>字體大小</label>
+                                        <select id="line_text_size">
+                                            <option value="8px">8</option><option value="9px">9</option>
+                                            <option value="10px">10</option><option value="11px">11</option>
+                                            <option value="12px">12</option><option value="13px">13</option>
+                                            <option value="20px">20</option><option value="40px">40</option>
+                                        </select>
                                     </div>
+                                    <div class="eight wide field">
+                                        <label>字顏色</label>
+                                        <input type='text' class="color_picker" />
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label>內容</label>
+                                    <input type='text' id='line_text_content' />
+                                </div>
+                                <div class="field">
+                                    <label>字角度：<span id="line_text_arc"></span></label>
+                                    <div class="ui brown line range" id="line_arc_ranger"></div>
                                 </div>
                                 <div class="fields">
-                                    <div class="field">
-                                        <button class="ui button icon_button" style="background-image: url('img/marker01.png');"></button>
+                                    <div class="eight wide field">
+                                        <label>線寬</label>
+                                        <select id="line_size">
+                                            <option value="8px">8</option><option value="9px">9</option>
+                                            <option value="10px">10</option><option value="11px">11</option>
+                                            <option value="12px">12</option><option value="13px">13</option>
+                                            <option value="20px">20</option><option value="40px">40</option>
+                                        </select>
                                     </div>
-                                    <div class="field">
-                                        <button class="ui button icon_button" style="background-image: url('img/marker02.png');"></button>
-                                    </div>
-                                    <div class="field">
-                                        <button class="ui button icon_button" style="background-image: url('img/marker03.png');"></button>
+                                    <div class="eight wide field">
+                                        <label>線顏色</label>
+                                        <input type='text' class="color_picker" />
                                     </div>
                                 </div>
+                                <button class="ui button" id="line_button">套用</button>
                             </div>
                         </div>
-                        <!-- arrow -->
+                        <!-- polygon -->
                         <div class="ui tab segment" data-tab="four">
-                            <div class="ui form" id="arrow_menu">
+                            <div class="ui form" id="poly_menu">
                                 <div class="fields">
-                                    <div class="field">
-                                        <label>疏散避難路線</label>
-                                        <button class="ui button" style="background-image: url('img/line01.png');" id="red_line"></button>
+                                    <div class="eight wide field">
+                                        <label>字體大小</label>
+                                        <select id="text_size">
+                                            <option value="8px">8</option><option value="9px">9</option>
+                                            <option value="10px">10</option><option value="11px">11</option>
+                                            <option value="12px">12</option><option value="13px">13</option>
+                                            <option value="20px">20</option><option value="40px">40</option>
+                                        </select>
                                     </div>
-                                    <div class="field">
-                                        <label>方向指示箭頭</label>
-                                        <button class="ui button" style="background-image: url('img/line02.png');" id="green_line"></button>
+                                    <div class="eight wide field">
+                                        <label>字顏色</label>
+                                        <input type='text' class="color_picker" />
                                     </div>
                                 </div>
+                                <div class="field">
+                                    <label>內容</label>
+                                    <input type='text' id='text_content' />
+                                </div>
+                                <div class="field">
+                                    <label>字角度：<span id="poly_text_arc"></span></label>
+                                    <div class="ui brown range" id="poly_arc_ranger"></div>
+                                </div>
+                                <div class="fields">
+                                    <div class="eight wide field">
+                                        <label>邊寬</label>
+                                        <select id="text_size">
+                                            <option value="8px">8</option><option value="9px">9</option>
+                                            <option value="10px">10</option><option value="11px">11</option>
+                                            <option value="12px">12</option><option value="13px">13</option>
+                                            <option value="20px">20</option><option value="40px">40</option>
+                                        </select>
+                                    </div>
+                                    <div class="eight wide field">
+                                        <label>多邊形顏色</label>
+                                        <input type='text' class="color_picker" />
+                                    </div>
+                                </div>
+                                <button class="ui button" id="poly_button">套用</button>
                             </div>
                         </div>
                     </div>

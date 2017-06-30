@@ -36,41 +36,93 @@ $(document).ready(function () {
     /********* component init ***********/
     $('.ui.accordion').accordion({
         onOpen: function () {
-            if ($(this).index(".content") == 0 && $(".tab.active").index(".tab") == 1) {
+            if ($(this).index(".content") == 0) {
                 // fix prpblem when add text, edit text then add text again
                 // init again
-                $('.ui.range').range({
-                    min: -90,
-                    max: 90,
-                    start: 0,
-                    step: 30,
-                    onChange: function(value) {
-                        $('#text_arc').html(value);
-                    }
-                });
+                switch($(this).index(".tab")){
+                    case 1:
+                        // the ranger wont display until tab index 1 is clicked
+                        // so if ranger init at first, the function wont work
+                        $("#point_arc_ranger").range({
+                            min: -90,
+                            max: 90,
+                            start: 0,
+                            step: 30,
+                            onChange: function(value) {
+                                $("#point_text_arc").html(value);
+                            }
+                        });
+                        break;
+                    case 2:
+                        $('#line_arc_ranger').range({
+                            min: -90,
+                            max: 90,
+                            start: 0,
+                            step: 30,
+                            onChange: function(value) {
+                                $("#line_text_arc").html(value);
+                            }
+                        });
+                        break;
+                    case 3:
+                        $('#poly_arc_ranger').range({
+                            min: -90,
+                            max: 90,
+                            start: 0,
+                            step: 30,
+                            onChange: function(value) {
+                                $("#poly_text_arc").html(value);
+                            }
+                        });
+                        break;
+                }
             }
         }
     });
 
     $('.secondary.menu > .item').tab({
         onVisible: function() {
-            if($(this).index(".tab") == 1){
-                // the ranger wont display until tab index 1 is clicked
-                // so if ranger init at first, the function wont work
-                $('.ui.range').range({
-                    min: -90,
-                    max: 90,
-                    start: 0,
-                    step: 30,
-                    onChange: function(value) {
-                        $('#text_arc').html(value);
-                    }
-                });
+            // the ranger wont display until tab index 1 is clicked
+            // so if ranger init at first, the function wont work
+            switch($(this).index(".tab")){
+                case 1:
+                    $("#point_arc_ranger").range({
+                        min: -90,
+                        max: 90,
+                        start: 0,
+                        step: 30,
+                        onChange: function(value) {
+                            $("#point_text_arc").html(value);
+                        }
+                    });
+                    break;
+                case 2:
+                    $('#line_arc_ranger').range({
+                        min: -90,
+                        max: 90,
+                        start: 0,
+                        step: 30,
+                        onChange: function(value) {
+                            $("#line_text_arc").html(value);
+                        }
+                    });
+                    break;
+                case 3:
+                    $('#poly_arc_ranger').range({
+                        min: -90,
+                        max: 90,
+                        start: 0,
+                        step: 30,
+                        onChange: function(value) {
+                            $("#poly_text_arc").html(value);
+                        }
+                    });
+                    break;
             }
         }
     });
 
-    $("#color_picker").spectrum({
+    $(".color_picker").spectrum({
         preferredFormat: "hex",
         color: "#000000",
         chooseText: "套用"
@@ -145,15 +197,17 @@ $(document).ready(function () {
         }
     });
 
-    $('#text_button').click(function () {
+    $('#point_button').click(function () {
         map.removeInteraction(draw); // remove old brush
-        writeText();
+        drawIconText();
     })
 
+    /*
     $('.icon_button').click(function () {
         map.removeInteraction(draw); // remove old brush
         putIcon( $(this).css('background-image').substr(-18,16) );
     });
+    */
 
     $('#red_line').click(function () {
         map.removeInteraction(draw); // remove old brush
@@ -353,7 +407,7 @@ $(document).ready(function () {
         vectorSource.forEachFeature(function(feature) {
             var clone = feature.clone();
             clone.setId(feature.getId());  // clone does not set the id
-            clone.getGeometry().transform(ol.proj.get('EPSG:3857'), 'EPSG:4326');
+            //clone.getGeometry().transform(ol.proj.get('EPSG:3857'), 'EPSG:4326');
             features.push(clone);
         });
         var string = new ol.format.KML().writeFeatures(features);
@@ -375,7 +429,7 @@ $(document).ready(function () {
         vectorSource.forEachFeature(function(feature) {
             var clone = feature.clone();
             clone.setId(feature.getId());  // clone does not set the id
-            clone.getGeometry().transform(ol.proj.get('EPSG:3857'), 'EPSG:4326');
+            //clone.getGeometry().transform(ol.proj.get('EPSG:3857'), 'EPSG:4326');
             features.push(clone);
         });
         var string = new ol.format.KML().writeFeatures(features);
@@ -537,22 +591,28 @@ function drawCircle(circle_plane_color,circle_line_color){
     runBrush();
 }
 
-function writeText(/*content,color,size,rotation*/){
+function drawIconText(/*content,color,size,rotation*/){
     setDefaultFeatures();
     type = "Point";
-    text_content = $('#text_content').val();//content;
-    text_color = $('#color_picker').val();//color;
-    text_size = $('#text_size').val();//size;
-    text_rotation = parseInt($('#text_arc').html())*Math.PI/180;
+    text_content = $('#point_text_content').val();//content;
+    text_color = $('#point_menu > .fields').first().children(".field:nth-child(2)").children('.color_picker').val();//color;
+    text_size = $('#point_text_size').val();//size;
+    text_rotation = parseInt($('#point_text_arc').html())*Math.PI/180;
+
+    if ($("input[name=point_icon]:checked").val() != "none") {
+        icon_url = $("input[name=point_icon]:checked").val();
+        isIcon = true;
+    }
     runBrush("font");
 }
 
+/*
 function putIcon(url){
     setDefaultFeatures();
     type = "Point";
-    icon_url = url;
+
     console.log( icon_url);
-    isIcon = true;
+
     text_content = $('#icon_text').val();//content;
     text_color = "rgb(0,0,0)";
     text_size = "20px";
@@ -565,6 +625,7 @@ function putIcon(url){
     }
     runBrush(draw_type);
 }
+*/
 
 /**
 * Format length output.
@@ -607,12 +668,7 @@ function createMeasureTooltip() {
     map.addOverlay(measureTooltip);
 }
 
-$text_point_cnt = 0;
-$home_point_cnt = 0;
-$h_point_cnt = 0;
-$tri_point_cnt = 0;
-$red_line_cnt = 0;
-$green_line_cnt = 0;
+var $cnt = 0;
 function runBrush(draw_type) {
     draw = new ol.interaction.Draw({
         features: features,
@@ -625,17 +681,6 @@ function runBrush(draw_type) {
 
 
     draw.on('drawstart',function(event){
-        var $cnt;
-        switch(draw_type){
-            case "font":  $cnt = $text_point_cnt; $text_point_cnt++;        break;
-            case "home":  $cnt = $home_point_cnt; $home_point_cnt++;        break;
-            case "h":     $cnt = $h_point_cnt;    $h_point_cnt++;           break;
-            case "warning sign":   $cnt = $tri_point_cnt;  $tri_point_cnt++;    break;
-            case "red_line":   $cnt = $red_line_cnt;   $red_line_cnt++;     break;
-            case "green_line": $cnt = $green_line_cnt; $green_line_cnt++;   break;
-            default:      $cnt = 0;     break;
-        }
-
         var s = new ol.style.Style({
             image: getImage(),
             stroke: new ol.style.Stroke({
@@ -660,11 +705,12 @@ function runBrush(draw_type) {
         // set current feature ID
         sketch = event.feature;
         sketch.setId(draw_type + " " + $cnt);
+        $cnt++;
         // add to editor
         $("#editor > tbody").append(
             "<tr>" +
                 "<td>" +
-                    "<h2 class='ui center aligned header'>" + ($text_point_cnt+$home_point_cnt+$h_point_cnt+$tri_point_cnt+$red_line_cnt+$green_line_cnt) + "</h2>" +
+                    "<h2 class='ui center aligned header'>" + $cnt + "</h2>" +
                     "<div style='display: none;'>" + (draw_type + " " + $cnt) + "</div>" +
                 "</td>" +
                 "<td>" +
