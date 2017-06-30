@@ -135,10 +135,10 @@
                                     <div class="eight wide field">
                                         <label>線寬</label>
                                         <select id="line_size">
-                                            <option value="8px">8</option><option value="9px">9</option>
-                                            <option value="10px">10</option><option value="11px">11</option>
-                                            <option value="12px">12</option><option value="13px">13</option>
-                                            <option value="20px">20</option><option value="40px">40</option>
+                                            <option value="8">8</option><option value="9">9</option>
+                                            <option value="10">10</option><option value="11">11</option>
+                                            <option value="12">12</option><option value="13">13</option>
+                                            <option value="20">20</option><option value="40">40</option>
                                         </select>
                                     </div>
                                     <div class="eight wide field">
@@ -155,7 +155,7 @@
                                 <div class="fields">
                                     <div class="eight wide field">
                                         <label>字體大小</label>
-                                        <select id="text_size">
+                                        <select id="poly_text_size">
                                             <option value="8px">8</option><option value="9px">9</option>
                                             <option value="10px">10</option><option value="11px">11</option>
                                             <option value="12px">12</option><option value="13px">13</option>
@@ -169,23 +169,27 @@
                                 </div>
                                 <div class="field">
                                     <label>內容</label>
-                                    <input type='text' id='text_content' />
+                                    <input type='text' id='poly_text_content' />
                                 </div>
                                 <div class="field">
                                     <label>字角度：<span id="poly_text_arc"></span></label>
                                     <div class="ui brown range" id="poly_arc_ranger"></div>
                                 </div>
                                 <div class="fields">
-                                    <div class="eight wide field">
+                                    <div class="field">
                                         <label>邊寬</label>
-                                        <select id="text_size">
-                                            <option value="8px">8</option><option value="9px">9</option>
-                                            <option value="10px">10</option><option value="11px">11</option>
-                                            <option value="12px">12</option><option value="13px">13</option>
-                                            <option value="20px">20</option><option value="40px">40</option>
+                                        <select id="poly_border_size">
+                                            <option value="8">8</option><option value="9">9</option>
+                                            <option value="10">10</option><option value="11">11</option>
+                                            <option value="12">12</option><option value="13">13</option>
+                                            <option value="20">20</option><option value="40">40</option>
                                         </select>
                                     </div>
-                                    <div class="eight wide field">
+                                    <div class="four wide field">
+                                        <label>邊框顏色</label>
+                                        <input type='text' class="color_picker" />
+                                    </div>
+                                    <div class="field">
                                         <label>多邊形顏色</label>
                                         <input type='text' class="color_picker" />
                                     </div>
