@@ -6,7 +6,7 @@ var features;
 var modify;
 
 $(document).ready(function () {
-    
+
     /********* component init ***********/
     $('.ui.accordion').accordion({
         onOpen: function () {
@@ -209,6 +209,8 @@ $(document).ready(function () {
         var feature = featureOverlay.getSource().getFeatureById(feature_id);
         if (feature_id.split(' ')[0] == "polygon") {
             var coord = feature.getGeometry().getCoordinates()[0][0];
+        }else if(feature_id.split(' ')[0] == "font"){
+            var coord = feature.getGeometry().getCoordinates();
         }else{
             var coord = feature.getGeometry().getCoordinates()[0];
         }
@@ -600,7 +602,7 @@ $(document).ready(function () {
             xfbml      : true,
             version    : 'v2.8'
         });
-        FB.AppEvents.logPageView();   
+        FB.AppEvents.logPageView();
     };
 
     (function(d, s, id){
