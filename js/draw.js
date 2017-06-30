@@ -637,7 +637,7 @@ $(document).ready(function () {
                 console.log(response);
             }
         });
-    });
+    };
     /*************** !share **************/
 
 
