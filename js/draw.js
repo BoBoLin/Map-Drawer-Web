@@ -10,41 +10,93 @@ $(document).ready(function () {
     /********* component init ***********/
     $('.ui.accordion').accordion({
         onOpen: function () {
-            if ($(this).index(".content") == 0 && $(".tab.active").index(".tab") == 1) {
+            if ($(this).index(".content") == 0) {
                 // fix prpblem when add text, edit text then add text again
                 // init again
-                $('.ui.range').range({
-                    min: -90,
-                    max: 90,
-                    start: 0,
-                    step: 30,
-                    onChange: function(value) {
-                        $('#text_arc').html(value);
-                    }
-                });
+                switch($(this).index(".tab")){
+                    case 1:
+                        // the ranger wont display until tab index 1 is clicked
+                        // so if ranger init at first, the function wont work
+                        $("#point_arc_ranger").range({
+                            min: -90,
+                            max: 90,
+                            start: 0,
+                            step: 30,
+                            onChange: function(value) {
+                                $("#point_text_arc").html(value);
+                            }
+                        });
+                        break;
+                    case 2:
+                        $('#line_arc_ranger').range({
+                            min: -90,
+                            max: 90,
+                            start: 0,
+                            step: 30,
+                            onChange: function(value) {
+                                $("#line_text_arc").html(value);
+                            }
+                        });
+                        break;
+                    case 3:
+                        $('#poly_arc_ranger').range({
+                            min: -90,
+                            max: 90,
+                            start: 0,
+                            step: 30,
+                            onChange: function(value) {
+                                $("#poly_text_arc").html(value);
+                            }
+                        });
+                        break;
+                }
             }
         }
     });
 
     $('.secondary.menu > .item').tab({
         onVisible: function() {
-            if($(this).index(".tab") == 1){
-                // the ranger wont display until tab index 1 is clicked
-                // so if ranger init at first, the function wont work
-                $('.ui.range').range({
-                    min: -90,
-                    max: 90,
-                    start: 0,
-                    step: 30,
-                    onChange: function(value) {
-                        $('#text_arc').html(value);
-                    }
-                });
+            // the ranger wont display until tab index 1 is clicked
+            // so if ranger init at first, the function wont work
+            switch($(this).index(".tab")){
+                case 1:
+                    $("#point_arc_ranger").range({
+                        min: -90,
+                        max: 90,
+                        start: 0,
+                        step: 30,
+                        onChange: function(value) {
+                            $("#point_text_arc").html(value);
+                        }
+                    });
+                    break;
+                case 2:
+                    $('#line_arc_ranger').range({
+                        min: -90,
+                        max: 90,
+                        start: 0,
+                        step: 30,
+                        onChange: function(value) {
+                            $("#line_text_arc").html(value);
+                        }
+                    });
+                    break;
+                case 3:
+                    $('#poly_arc_ranger').range({
+                        min: -90,
+                        max: 90,
+                        start: 0,
+                        step: 30,
+                        onChange: function(value) {
+                            $("#poly_text_arc").html(value);
+                        }
+                    });
+                    break;
             }
         }
     });
 
-    $("#color_picker").spectrum({
+    $(".color_picker").spectrum({
         preferredFormat: "hex",
         color: "#000000",
         chooseText: "套用"
@@ -119,31 +171,30 @@ $(document).ready(function () {
         }
     });
 
-    $('#text_button').click(function () {
+    $('#point_button').click(function () {
         map.removeInteraction(draw); // remove old brush
-        writeText();
-    })
-
-    $('.icon_button').click(function () {
-        map.removeInteraction(draw); // remove old brush
-        putIcon( $(this).css('background-image').substr(-18,16) );
+        drawIconText();
     });
 
-    $('#red_line').click(function () {
+    $('#line_button').click(function () {
         map.removeInteraction(draw); // remove old brush
-        drawLine('rgba(255, 0, 0, 0.5)', 5);
+        drawLine();
     });
 
-    $('#green_line').click(function () {
+    $('#poly_button').click(function () {
         map.removeInteraction(draw); // remove old brush
-        drawLine('rgba(0, 255, 0, 0.5)', 15);
-    })
+        drawPolygon();
+    });
 
     $(document).on('click', '.search.button', function () {
         var feature_id = $(this).parent().siblings("td").first().children("div").text();
-        if (feature_id.split(' ')[0] == "green_line" || feature_id.split(' ')[0] == "red_line") {
+        if (feature_id.split(' ')[0] == "line") {
             map.getView().setCenter(
                 featureOverlay.getSource().getFeatureById(feature_id).getGeometry().getCoordinates()[0]
+            );
+        }else if(feature_id.split(' ')[0] == "polygon"){
+            map.getView().setCenter(
+                featureOverlay.getSource().getFeatureById(feature_id).getGeometry().getCoordinates()[0][0]
             );
         }else{
             map.getView().setCenter(
@@ -156,44 +207,74 @@ $(document).ready(function () {
     $(document).on('click', '.edit.button', function () {
         var feature_id = $(this).parent().siblings("td").first().children("div").text();
         var feature = featureOverlay.getSource().getFeatureById(feature_id);
-        var coord = feature.getGeometry().getCoordinates();
+        if (feature_id.split(' ')[0] == "polygon") {
+            var coord = feature.getGeometry().getCoordinates()[0][0];
+        }else{
+            var coord = feature.getGeometry().getCoordinates()[0];
+        }
         coord[1] += 7000;
         popup_overlay.setPosition(coord);
 
         var type = $(this).parent().siblings("td:nth-child(2)").children("i").attr('class');
         switch(type){
             case 'font icon':
+            case 'home icon':
+            case 'h icon':
+            case 'warning sign icon':
                 var text_style = feature.getStyle().getText();
                 var text_size = parseInt(((text_style.getFont()).split('px'))[0]);
+                if (feature.getStyle().getImage().getImage().toString().indexOf("Image") != -1) {
+                    var img = feature.getStyle().getImage().getSrc();
+                }else{
+                    var img = "none";
+                }
 
                 content.innerHTML =
                     "<div style='display: none;'>" + feature_id + "</div>" +
                     "<div class='ui form'>" +
                         "<div class='fields'>" +
                             "<div class='eight wide field'>" +
-                                "<label>字體</label>" +
+                                "<label>字體大小</label>" +
                                 "<select id='update_text_size'>" +
-                                    ((text_size == 8) ? "<option value='8px' selected='selected'>8</option>" : "<option value='8px'>8</option>") +
-                                    ((text_size == 9) ? "<option value='9px' selected='selected'>9</option>" : "<option value='9px'>9</option>") +
-                                    ((text_size == 10) ? "<option value='10px' selected='selected'>10</option>" : "<option value='10px'>10</option>") +
-                                    ((text_size == 11) ? "<option value='11px' selected='selected'>11</option>" : "<option value='11px'>11</option>") +
-                                    ((text_size == 12) ? "<option value='12px' selected='selected'>12</option>" : "<option value='12px'>12</option>") +
-                                    ((text_size == 13) ? "<option value='13px' selected='selected'>13</option>" : "<option value='13px'>13</option>") +
-                                    ((text_size == 20) ? "<option value='20px' selected='selected'>20</option>" : "<option value='20px'>20</option>") +
-                                    ((text_size == 40) ? "<option value='40px' selected='selected'>40</option>" : "<option value='40px'>40</option>") +
+                                    "<option value='8px' " + ((text_size == 8)? "selected='selected'" : "") + ">8</option>" +
+                                    "<option value='9px' " + ((text_size == 9)? "selected='selected'" : "") + ">9</option>" +
+                                    "<option value='10px' " + ((text_size == 10)? "selected='selected'" : "") + ">10</option>" +
+                                    "<option value='11px' " + ((text_size == 11)? "selected='selected'" : "") + ">11</option>" +
+                                    "<option value='12px' " + ((text_size == 12)? "selected='selected'" : "") + ">12</option>" +
+                                    "<option value='13px' " + ((text_size == 13)? "selected='selected'" : "") + ">13</option>" +
+                                    "<option value='20px' " + ((text_size == 20)? "selected='selected'" : "") + ">20</option>" +
+                                    "<option value='40px' " + ((text_size == 40)? "selected='selected'" : "") + ">40</option>" +
                                 "</select>" +
                             "</div>" +
                             "<div class='eight wide field'>" +
-                                "<label>顏色</label>" +
+                                "<label>字顏色</label>" +
                                 "<input type='text' id='update_color_picker' />" +
                             "</div>" +
                         "</div>" +
                         "<div class='field'>" +
                             "<label>內容</label>" +
-                            "<textarea name='' id='update_text_content' rows='3'>" + text_style.getText() + "</textarea>" +
+                            "<input type='text' id='update_text_content' val='" + text_style.getText() + "'/>" +
+                        "</div>" +
+                        "<div class='fields'>" +
+                            "<div class='field'>" +
+                                "<input type='radio' name='update_point_icon' " + ((img == "none")? "checked='checked'" : "") + " value='none' tabindex='0'>" +
+                                "<p>無圖示</p>" +
+                            "</div>" +
+                            "<div class='field'>" +
+                                "<input type='radio' name='update_point_icon' " + ((img == "img/marker01.png")? "checked='checked'" : "") + " value='img/marker01.png' tabindex='0'>" +
+                                "<img class='ui small image' src='img/marker01.png'>" +
+                            "</div>" +
+                            "<div class='field'>" +
+                                "<input type='radio' name='update_point_icon' " + ((img == "img/marker02.png")? "checked='checked'" : "") + " value='img/marker02.png' tabindex='0'>" +
+                                "<img class='ui small image' src='img/marker02.png'>" +
+                            "</div>" +
+                            "<div class='field'>" +
+                                "<input type='radio' name='update_point_icon' " + ((img == "img/marker03.png")? "checked='checked'" : "") + " value='img/marker03.png' tabindex='0'>" +
+                                "<img class='ui small image' src='img/marker03.png'>" +
+                            "</div>" +
                         "</div>" +
                         "<div class='field'>" +
-                            "<label>角度：<span id='update_text_arc'></span></label>" +
+                            "<label>字角度：<span id='update_text_arc'></span></label>" +
                             "<div class='ui brown range'></div>" +
                         "</div>" +
                     "</div>";
@@ -214,38 +295,171 @@ $(document).ready(function () {
                     }
                 });
                 break;
-            case 'home icon':
-            case 'h icon':
-            case 'warning sign icon':
-                var img = feature.getStyle().getImage().getSrc();
-                var text = feature.getStyle().getText().getText();
+
+            case 'arrow left icon':
+                var text_style = feature.getStyle().getText();
+                var text_size = parseInt(((text_style.getFont()).split('px'))[0]);
+                var line_style = feature.getStyle().getStroke();
+                var line_width = parseInt(line_style.getWidth());
 
                 content.innerHTML =
                     "<div style='display: none;'>" + feature_id + "</div>" +
                     "<div class='ui form'>" +
-                        "<div class='eight wide field'>" +
-                            "<div class='ui labeled input'>" +
-                                "<div class='ui basic label'>名稱</div>" +
-                                "<input type='text' id='update_icon_text' value='" + text + "'/>" +
+                        "<div class='fields'>" +
+                            "<div class='eight wide field'>" +
+                                "<label>字體大小</label>" +
+                                "<select id='update_text_size'>" +
+                                    "<option value='8px' " + ((text_size == 8)? "selected='selected'" : "") + ">8</option>" +
+                                    "<option value='9px' " + ((text_size == 9)? "selected='selected'" : "") + ">9</option>" +
+                                    "<option value='10px' " + ((text_size == 10)? "selected='selected'" : "") + ">10</option>" +
+                                    "<option value='11px' " + ((text_size == 11)? "selected='selected'" : "") + ">11</option>" +
+                                    "<option value='12px' " + ((text_size == 12)? "selected='selected'" : "") + ">12</option>" +
+                                    "<option value='13px' " + ((text_size == 13)? "selected='selected'" : "") + ">13</option>" +
+                                    "<option value='20px' " + ((text_size == 20)? "selected='selected'" : "") + ">20</option>" +
+                                    "<option value='40px' " + ((text_size == 40)? "selected='selected'" : "") + ">40</option>" +
+                                "</select>" +
+                            "</div>" +
+                            "<div class='eight wide field'>" +
+                                "<label>字顏色</label>" +
+                                "<input type='text' id='update_text_color_picker' />" +
                             "</div>" +
                         "</div>" +
+                        "<div class='field'>" +
+                            "<label>內容</label>" +
+                            "<input type='text' id='update_text_content' value='" + text_style.getText() + "'/>" +
+                        "</div>" +
+                        "<div class='field'>" +
+                            "<label>字角度：<span id='update_text_arc'></span></label>" +
+                            "<div class='ui brown range'></div>" +
+                        "</div>" +
                         "<div class='fields'>" +
-                            "<div class='field'>" +
-                                ((img == 'img/marker01.png')? "<input type='radio' name='update_icon' value='img/marker01.png' checked='true' tabindex='0'>" : "<input type='radio' name='update_icon' value='img/marker01.png' tabindex='0'>") +
-                                "<img class='ui small image' src='img/marker01.png'>" +
+                            "<div class='eight wide field'>" +
+                                "<label>線寬</label>" +
+                                "<select id='update_line_size'>" +
+                                    "<option value='8' " + ((line_width == 8)? "selected='selected'" : "") + ">8</option>" +
+                                    "<option value='9' " + ((line_width == 9)? "selected='selected'" : "") + ">9</option>" +
+                                    "<option value='10' " + ((line_width == 10)? "selected='selected'" : "") + ">10</option>" +
+                                    "<option value='11' " + ((line_width == 11)? "selected='selected'" : "") + ">11</option>" +
+                                    "<option value='12' " + ((line_width == 12)? "selected='selected'" : "") + ">12</option>" +
+                                    "<option value='13' " + ((line_width == 13)? "selected='selected'" : "") + ">13</option>" +
+                                    "<option value='20' " + ((line_width == 20)? "selected='selected'" : "") + ">20</option>" +
+                                    "<option value='40' " + ((line_width == 40)? "selected='selected'" : "") + ">40</option>" +
+                                "</select>" +
                             "</div>" +
-                            "<div class='field'>" +
-                                ((img == 'img/marker02.png')? "<input type='radio' name='update_icon' value='img/marker02.png' checked='true' tabindex='0'>" : "<input type='radio' name='update_icon' value='img/marker02.png' tabindex='0'>") +
-                                "<img class='ui small image' src='img/marker02.png'>" +
-                            "</div>" +
-                            "<div class='field'>" +
-                                ((img == 'img/marker03.png')? "<input type='radio' name='update_icon' value='img/marker03.png' checked='true' tabindex='0'>" : "<input type='radio' name='update_icon' value='img/marker03.png' tabindex='0'>") +
-                                "<img class='ui small image' src='img/marker03.png'>" +
+                            "<div class='eight wide field'>" +
+                                "<label>線顏色</label>" +
+                                "<input type='text' id='update_line_color_picker' />" +
                             "</div>" +
                         "</div>" +
                     "</div>";
+                $("#update_text_color_picker").spectrum({
+                    preferredFormat: "hex",
+                    color: text_style.getFill().getColor(),
+                    chooseText: "套用"
+                });
+                $("#update_line_color_picker").spectrum({
+                    preferredFormat: "hex",
+                    color: line_style.getColor(),
+                    chooseText: "套用"
+                });
+
+                $('.ui.range').range({
+                    min: -90,
+                    max: 90,
+                    start: parseInt((text_style.getRotation() * 180) / Math.PI),
+                    step: 30,
+                    onChange: function(value) {
+                        $('#update_text_arc').html(value);
+                    }
+                });
                 break;
-            case 'arrow left icon': break;
+
+            case 'square outline icon':
+                var text_style = feature.getStyle().getText();
+                var text_size = parseInt(((text_style.getFont()).split('px'))[0]);
+                var line_style = feature.getStyle().getStroke();
+                var line_width = parseInt(line_style.getWidth());
+                var fill_color = feature.getStyle().getFill().getColor();
+                content.innerHTML =
+                    "<div style='display: none;'>" + feature_id + "</div>" +
+                    "<div class='ui form'>" +
+                        "<div class='fields'>" +
+                            "<div class='eight wide field'>" +
+                                "<label>字體大小</label>" +
+                                "<select id='update_text_size'>" +
+                                    "<option value='8px' " + ((text_size == 8)? "selected='selected'" : "") + ">8</option>" +
+                                    "<option value='9px' " + ((text_size == 9)? "selected='selected'" : "") + ">9</option>" +
+                                    "<option value='10px' " + ((text_size == 10)? "selected='selected'" : "") + ">10</option>" +
+                                    "<option value='11px' " + ((text_size == 11)? "selected='selected'" : "") + ">11</option>" +
+                                    "<option value='12px' " + ((text_size == 12)? "selected='selected'" : "") + ">12</option>" +
+                                    "<option value='13px' " + ((text_size == 13)? "selected='selected'" : "") + ">13</option>" +
+                                    "<option value='20px' " + ((text_size == 20)? "selected='selected'" : "") + ">20</option>" +
+                                    "<option value='40px' " + ((text_size == 40)? "selected='selected'" : "") + ">40</option>" +
+                                "</select>" +
+                            "</div>" +
+                            "<div class='eight wide field'>" +
+                                "<label>字顏色</label>" +
+                                "<input type='text' id='update_text_color_picker' />" +
+                            "</div>" +
+                        "</div>" +
+                        "<div class='field'>" +
+                            "<label>內容</label>" +
+                            "<input type='text' id='update_text_content' value='" + text_style.getText() + "' />" +
+                        "</div>" +
+                        "<div class='field'>" +
+                            "<label>字角度：<span id='update_text_arc'></span></label>" +
+                            "<div class='ui brown range' id='update_arc_ranger'></div>" +
+                        "</div>" +
+                        "<div class='fields'>" +
+                            "<div class='field'>" +
+                                "<label>邊寬</label>" +
+                                "<select id='update_border_size'>" +
+                                    "<option value='8' " + ((line_width == 8)? "selected='selected'" : "") + ">8</option>" +
+                                    "<option value='9' " + ((line_width == 9)? "selected='selected'" : "") + ">9</option>" +
+                                    "<option value='10' " + ((line_width == 10)? "selected='selected'" : "") + ">10</option>" +
+                                    "<option value='11' " + ((line_width == 11)? "selected='selected'" : "") + ">11</option>" +
+                                    "<option value='12' " + ((line_width == 12)? "selected='selected'" : "") + ">12</option>" +
+                                    "<option value='13' " + ((line_width == 13)? "selected='selected'" : "") + ">13</option>" +
+                                    "<option value='20' " + ((line_width == 20)? "selected='selected'" : "") + ">20</option>" +
+                                    "<option value='40' " + ((line_width == 40)? "selected='selected'" : "") + ">40</option>" +
+                                "</select>" +
+                            "</div>" +
+                            "<div class='five wide field'>" +
+                                "<label>邊框顏色</label>" +
+                                "<input type='text' id='update_border_color_picker' />" +
+                            "</div>" +
+                            "<div class='field'>" +
+                                "<label>多邊形顏色</label>" +
+                                "<input type='text' id='update_poly_color_picker' />" +
+                            "</div>" +
+                        "</div>" +
+                    "</div>";
+                $("#update_text_color_picker").spectrum({
+                    preferredFormat: "hex",
+                    color: text_style.getFill().getColor(),
+                    chooseText: "套用"
+                });
+                $("#update_border_color_picker").spectrum({
+                    preferredFormat: "hex",
+                    color: line_style.getColor(),
+                    chooseText: "套用"
+                });
+                $("#update_poly_color_picker").spectrum({
+                    preferredFormat: "hex",
+                    color: fill_color,
+                    chooseText: "套用"
+                });
+
+                $('.ui.range').range({
+                    min: -90,
+                    max: 90,
+                    start: parseInt((text_style.getRotation() * 180) / Math.PI),
+                    step: 30,
+                    onChange: function(value) {
+                        $('#update_text_arc').html(value);
+                    }
+                });
+                break;
         }
     });
 
@@ -264,8 +478,19 @@ $(document).ready(function () {
 
         switch((feature_id.split(' '))[0]){
             case 'font':
+            case 'home':
+            case 'h':
+            case 'warning':
+                var text_style = feature.getStyle().getText();
                 var new_style = new ol.style.Style({
-                    image: "",
+                    image: (($("input[name=update_point_icon]:checked").val()=="none")? "" :
+                            new ol.style.Icon(({
+                                anchor: [0.5, 46],
+                                anchorXUnits: 'fraction',
+                                anchorYUnits: 'pixels',
+                                scale: 0.125,
+                                src: $("input[name=update_point_icon]:checked").val(),
+                            }))),
                     stroke: new ol.style.Stroke({
                         color: "",
                         width: "",
@@ -275,7 +500,7 @@ $(document).ready(function () {
                     }),
                     text: new ol.style.Text({
                         font: $('#update_text_size').val()+" Microsoft Yahei,sans-serif",
-                        fill: new ol.style.Fill({ color: $('#update_color_picker').val() }),
+                        fill: new ol.style.Fill({ color: ($('#update_text_color_picker').val()=="")? text_style.getFill().getColor() : $('#update_text_color_picker').val() }),
                         stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
                         rotation: parseInt($('#update_text_arc').text())*Math.PI/180,
                         text: $('#update_text_content').val(),
@@ -284,30 +509,48 @@ $(document).ready(function () {
                 });
                 feature.setStyle(new_style);
                 break;
-            case 'home':
-            case 'h':
-            case 'warning':
+            case 'line':
+                var text_style = feature.getStyle().getText();
+                var line_style = feature.getStyle().getStroke();
                 var new_style = new ol.style.Style({
-                    image: new ol.style.Icon(({
-                                anchor: [0.5, 46],
-                                anchorXUnits: 'fraction',
-                                anchorYUnits: 'pixels',
-                                scale: 0.125,
-                                src: $("input[name=update_icon]:checked").val(),
-                            })),
+                    image: "",
                     stroke: new ol.style.Stroke({
-                        color: "",
-                        width: "",
+                        color: (($('#update_line_color_picker').val()=="")? line_style.getColor() : $('#update_line_color_picker').val()),
+                        width: parseInt($('#update_line_size').val()),
                     }),
                     fill: new ol.style.Fill({
                         color: "",
                     }),
                     text: new ol.style.Text({
-                        font: "20px Microsoft Yahei,sans-serif",
-                        fill: new ol.style.Fill({ color: "rgb(0,0,0)" }),
+                        font: $('#update_text_size').val()+" Microsoft Yahei,sans-serif",
+                        fill: new ol.style.Fill({ color: ($('#update_text_color_picker').val()=="")? text_style.getFill().getColor() : $('#update_text_color_picker').val() }),
                         stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
-                        rotation: 0,
-                        text: $('#update_icon_text').val(),
+                        rotation: parseInt($('#update_text_arc').text())*Math.PI/180,
+                        text: $('#update_text_content').val(),
+                        offsetY: -10
+                    })
+                });
+                feature.setStyle(new_style);
+                break;
+            case 'polygon':
+                var text_style = feature.getStyle().getText();
+                var line_style = feature.getStyle().getStroke();
+                var poly_color = feature.getStyle().getFill().getColor();
+                var new_style = new ol.style.Style({
+                    image: "",
+                    stroke: new ol.style.Stroke({
+                        color: (($('#update_border_color_picker').val()=="")? line_style.getColor() : $('#update_border_color_picker').val()),
+                        width: parseInt($('#update_border_size').val()),
+                    }),
+                    fill: new ol.style.Fill({
+                        color: (($('#update_poly_color_picker').val()=="")? poly_color : $('#update_poly_color_picker').val()),
+                    }),
+                    text: new ol.style.Text({
+                        font: $('#update_text_size').val()+" Microsoft Yahei,sans-serif",
+                        fill: new ol.style.Fill({ color: ($('#update_text_color_picker').val()=="")? text_style.getFill().getColor() : $('#update_text_color_picker').val() }),
+                        stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
+                        rotation: parseInt($('#update_text_arc').text())*Math.PI/180,
+                        text: $('#update_text_content').val(),
                         offsetY: -10
                     })
                 });
@@ -327,7 +570,7 @@ $(document).ready(function () {
         vectorSource.forEachFeature(function(feature) {
             var clone = feature.clone();
             clone.setId(feature.getId());  // clone does not set the id
-            clone.getGeometry().transform(ol.proj.get('EPSG:3857'), 'EPSG:4326');
+            //clone.getGeometry().transform(ol.proj.get('EPSG:3857'), 'EPSG:4326');
             features.push(clone);
         });
         var string = new ol.format.KML().writeFeatures(features);
@@ -379,7 +622,6 @@ $(document).ready(function () {
         vectorSource.forEachFeature(function(feature) {
             var clone = feature.clone();
             clone.setId(feature.getId());  // clone does not set the id
-            clone.getGeometry().transform(ol.proj.get('EPSG:3857'), 'EPSG:4326');
             features.push(clone);
         });
         var string = new ol.format.KML().writeFeatures(features);
@@ -395,39 +637,9 @@ $(document).ready(function () {
                 console.log(response);
             }
         });
-
-
-    }
-
-    $('#emailLink').on('click', function (event) {
-        dt = new Date();
-        time = dt.getFullYear() +""+(dt.getMonth()+1) +""+ dt.getDate() +""+dt.getHours() +""+ dt.getMinutes() +""+ dt.getSeconds();
-        rand = Math.floor((Math.random() * 100000) + 1);
-
-        var vectorSource = featureOverlay.getSource();
-        var features = [];
-        vectorSource.forEachFeature(function(feature) {
-            var clone = feature.clone();
-            clone.setId(feature.getId());  // clone does not set the id
-            clone.getGeometry().transform(ol.proj.get('EPSG:3857'), 'EPSG:4326');
-            features.push(clone);
-        });
-        var string = new ol.format.KML().writeFeatures(features);
-
-        var url = 'http://140.116.245.84/geo/Drawer_v2/Drawer/drawer.html?' + time + "" +rand;
-        event.preventDefault();
-        var email = '';
-        var subject = 'share the geo info';
-        var emailBody = 'url: ' + url;
-        window.location = 'mailto:' + email + '?subject=' + subject + '&body=' + emailBody;
-
-        $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string + "&type=insert" + "&date_str=" + time+ ""+ rand, dataType: 'jsonp', jsonpCallback: 'handler',
-            success: function(response) {
-                console.log(response);
-            }
-        });
     });
     /*************** !share **************/
+
 
     /*************** import KML *************/
     $("#import-kml").change(function(){
@@ -456,8 +668,6 @@ $(document).ready(function () {
     });
 });
 
-//////////  featureOverlay.getSource().getFeatures()
-//////////  featureOverlay.getSource().getFeatureById("h 0");
 // global variable
 var draw;
 var type;
@@ -514,6 +724,7 @@ function map_move_mode(){
     map.addInteraction(interaction);
 }
 
+/*
 function drawPoint(color,radius){
     setDefaultFeatures();
     type = "Point";
@@ -521,30 +732,45 @@ function drawPoint(color,radius){
     point_radius = radius;
     runBrush();
 }
+*/
 
-function drawLine(color,width){
+function drawLine(){
     setDefaultFeatures();
     type = "LineString";
-    line_color = color;
-    line_width = width;
 
-    var draw_type = "";
-    switch(color){
-        case 'rgba(255, 0, 0, 0.5)':    draw_type = "red_line"; break;
-        case 'rgba(0, 255, 0, 0.5)':    draw_type = "green_line"; break;
-    }
-    runBrush(draw_type);
+    text_content = $('#line_text_content').val();//content;
+    text_color = $('#line_menu > .fields').first().children(".field:nth-child(2)").children('.color_picker').val();//color;
+    text_size = $('#line_text_size').val();//size;
+    text_rotation = parseInt($('#line_text_arc').text())*Math.PI/180;
+
+    line_color = $('#line_menu > .fields:nth-child(4)').children(".field:nth-child(2)").children('.color_picker').val();
+    line_width = $('#line_size').val();
+
+    runBrush("line");
 }
 
-function drawPolygon(polygon_plane_color,polygon_line_color){
+function drawPolygon(){
     setDefaultFeatures();
     type = "Polygon";
-    plane_color = polygon_plane_color;
-    line_color = polygon_line_color;
-    line_width = 3;
-    runBrush();
+
+    text_content = $('#poly_text_content').val();//content;
+    text_color = $('#poly_menu > .fields').first().children(".field:nth-child(2)").children('.color_picker').val();//color;
+    text_size = $('#poly_text_size').val();//size;
+    text_rotation = parseInt($('#poly_text_arc').text())*Math.PI/180;
+
+    line_color = $('#poly_menu > .fields:nth-child(4)').children(".field:nth-child(2)").children('.color_picker').val();
+    line_width = $("#poly_border_size").val();
+
+    if ($('#poly_menu > .fields:nth-child(4)').children(".field:nth-child(3)").children('.color_picker').val() == "") {
+        plane_color = hexToRgbA("#000000");
+    }else{
+        plane_color = hexToRgbA($('#poly_menu > .fields:nth-child(4)').children(".field:nth-child(3)").children('.color_picker').val());
+    }
+
+    runBrush("polygon");
 }
 
+/*
 function drawCircle(circle_plane_color,circle_line_color){
     setDefaultFeatures();
     type = "Circle";
@@ -553,23 +779,36 @@ function drawCircle(circle_plane_color,circle_line_color){
     line_width = 3;
     runBrush();
 }
+*/
 
-function writeText(/*content,color,size,rotation*/){
+function drawIconText(/*content,color,size,rotation*/){
     setDefaultFeatures();
     type = "Point";
-    text_content = $('#text_content').val();//content;
-    text_color = $('#color_picker').val();//color;
-    text_size = $('#text_size').val();//size;
-    text_rotation = parseInt($('#text_arc').html())*Math.PI/180;
-    runBrush("font");
+    text_content = $('#point_text_content').val();//content;
+    text_color = $('#point_menu > .fields').first().children(".field:nth-child(2)").children('.color_picker').val();//color;
+    text_size = $('#point_text_size').val();//size;
+    text_rotation = parseInt($('#point_text_arc').html())*Math.PI/180;
+    var draw_type = "font";
+
+    if ($("input[name=point_icon]:checked").val() != "none") {
+        icon_url = $("input[name=point_icon]:checked").val();
+        isIcon = true;
+        switch(icon_url){
+            case 'img/marker01.png': draw_type = "home";        break;
+            case 'img/marker02.png': draw_type = "h";           break;
+            case 'img/marker03.png': draw_type = "warning sign";    break;
+        }
+    }
+    runBrush(draw_type);
 }
 
+/*
 function putIcon(url){
     setDefaultFeatures();
     type = "Point";
-    icon_url = url;
+
     console.log( icon_url);
-    isIcon = true;
+
     text_content = $('#icon_text').val();//content;
     text_color = "rgb(0,0,0)";
     text_size = "20px";
@@ -582,6 +821,7 @@ function putIcon(url){
     }
     runBrush(draw_type);
 }
+*/
 
 /**
 * Format length output.
@@ -624,12 +864,7 @@ function createMeasureTooltip() {
     map.addOverlay(measureTooltip);
 }
 
-$text_point_cnt = 0;
-$home_point_cnt = 0;
-$h_point_cnt = 0;
-$tri_point_cnt = 0;
-$red_line_cnt = 0;
-$green_line_cnt = 0;
+var $cnt = 0;
 function runBrush(draw_type) {
     draw = new ol.interaction.Draw({
         features: features,
@@ -642,17 +877,6 @@ function runBrush(draw_type) {
 
 
     draw.on('drawstart',function(event){
-        var $cnt;
-        switch(draw_type){
-            case "font":  $cnt = $text_point_cnt; $text_point_cnt++;        break;
-            case "home":  $cnt = $home_point_cnt; $home_point_cnt++;        break;
-            case "h":     $cnt = $h_point_cnt;    $h_point_cnt++;           break;
-            case "warning sign":   $cnt = $tri_point_cnt;  $tri_point_cnt++;    break;
-            case "red_line":   $cnt = $red_line_cnt;   $red_line_cnt++;     break;
-            case "green_line": $cnt = $green_line_cnt; $green_line_cnt++;   break;
-            default:      $cnt = 0;     break;
-        }
-
         var s = new ol.style.Style({
             image: getImage(),
             stroke: new ol.style.Stroke({
@@ -665,7 +889,7 @@ function runBrush(draw_type) {
             text: new ol.style.Text({
                 font: text_size+" Microsoft Yahei,sans-serif",
                 fill: new ol.style.Fill({ color: text_color }),
-                stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
+                stroke: new ol.style.Stroke({color: 'yellow', width: 0.8}),
                 rotation: text_rotation,
                 text: text_content,
                 offsetY: -10
@@ -681,11 +905,11 @@ function runBrush(draw_type) {
         $("#editor > tbody").append(
             "<tr>" +
                 "<td>" +
-                    "<h2 class='ui center aligned header'>" + ($text_point_cnt+$home_point_cnt+$h_point_cnt+$tri_point_cnt+$red_line_cnt+$green_line_cnt) + "</h2>" +
+                    "<h2 class='ui center aligned header'>" + $cnt + "</h2>" +
                     "<div style='display: none;'>" + (draw_type + " " + $cnt) + "</div>" +
                 "</td>" +
                 "<td>" +
-                    "<i class='" + ((draw_type=="red_line"||draw_type=="green_line")? "arrow left" : draw_type) + " icon'></i>" +
+                    "<i class='" + ((draw_type=="line")? "arrow left" : (draw_type=="polygon")? "square outline" : draw_type) + " icon'></i>" +
                     "(" + text_content + ")" +
                 "</td>" +
                 "<td>" +
@@ -699,6 +923,7 @@ function runBrush(draw_type) {
                 "</td>" +
             "</tr>"
         );
+        $cnt++;
 
         /** @type {ol.Coordinate|undefined} */
         var tooltipCoord = event.coordinate;
@@ -736,4 +961,17 @@ function getImage(){
         });
     }
     return image;
+}
+
+function hexToRgbA(hex){
+    var c;
+    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+        c= hex.substring(1).split('');
+        if(c.length== 3){
+            c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+        }
+        c= '0x'+c.join('');
+        return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+', 0.5)';
+    }
+    throw new Error('Bad Hex');
 }
