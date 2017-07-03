@@ -569,14 +569,26 @@ $(document).ready(function () {
     exportKMLElement.addEventListener('click', function(e) {
         var vectorSource = featureOverlay.getSource();
         var features = [];
+        /*****************handle text export*******************/
+        var myTexts = "";
         vectorSource.forEachFeature(function(feature) {
-            var clone = feature.clone();
-            clone.setId(feature.getId());  // clone does not set the id
-            //clone.getGeometry().transform(ol.proj.get('EPSG:3857'), 'EPSG:4326');
-            features.push(clone);
-        });
-        var string = new ol.format.KML().writeFeatures(features);
-        var base64 = btoa(string);
+            var id = feature.getId();
+            var content = feature.getStyle().getText().getText();
+            var font = feature.getStyle().getText().getFont();
+            var color = feature.getStyle().getText().getFill().getColor();
+            var rotation = feature.getStyle().getText().getRotation();
+            myText = "<myText id=\""+id+"\" content=\""+content+"\" font=\""+font+"\" color=\""+color+"\" rotation=\""+rotation+"\"></myText>";
+            myTexts += myText;
+            features.push(feature);
+        });  
+        var format = new ol.format.KML();       
+        var string = format.writeFeatures(features);
+        console.log(string);
+        var pos = string.indexOf("</kml>");
+        console.log(string);
+        var output = string.substr(0,pos) + myTexts + "</kml>";      
+        var base64 = btoa(output);
+        /*****************************************************/  
         /*
         $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string + "&type=insert", dataType: 'jsonp', jsonpCallback: 'handler',
             success: function(response) {
@@ -683,12 +695,32 @@ $(document).ready(function () {
         var reader = new FileReader();
         reader.onload = function (event) {
             // read feature to layer
-            $kml_str = event.target.result;
+            kml_str = event.target.result;
             var format = new ol.format.KML();
-            console.log(format.readFeatures($kml_str));
-            featureOverlay.getSource().addFeatures(format.readFeatures($kml_str));
+            console.log(format.readFeatures(kml_str));
+            featureOverlay.getSource().addFeatures(format.readFeatures(kml_str));
             featureOverlay.setMap(map);
-
+            /*** handle text import ***/
+            var kml_text = $(kml_str).find("myText");
+            for(var i=0;i<kml_text.size();i++){
+                var feature = featureOverlay.getSource().getFeatureById($(kml_text[i]).attr("id"));
+                var content = $(kml_text[i]).attr("content");
+                var font = $(kml_text[i]).attr("font");
+                var color = $(kml_text[i]).attr("color");
+                var rotation = $(kml_text[i]).attr("rotation");
+                var s = new ol.style.Style({
+                    text: new ol.style.Text({
+                        font: font,
+                        fill: new ol.style.Fill({ color: color }),
+                        stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
+                        rotation: parseFloat(rotation),
+                        text: content,
+                        offsetY: -10
+                    })
+                });                      
+                feature.setStyle(s);                
+            };
+            /*****************************/
             // draw on map
             var load_interaction = new ol.interaction.Modify({
                 features: new ol.Collection(featureOverlay.getSource().getFeatures())
