@@ -569,14 +569,26 @@ $(document).ready(function () {
     exportKMLElement.addEventListener('click', function(e) {
         var vectorSource = featureOverlay.getSource();
         var features = [];
+        /*****************handle text export*******************/
+        var myTexts = "";
         vectorSource.forEachFeature(function(feature) {
-            var clone = feature.clone();
-            clone.setId(feature.getId());  // clone does not set the id
-            //clone.getGeometry().transform(ol.proj.get('EPSG:3857'), 'EPSG:4326');
-            features.push(clone);
-        });
-        var string = new ol.format.KML().writeFeatures(features);
-        var base64 = btoa(string);
+            var id = feature.getId();
+            var content = feature.getStyle().getText().getText();
+            var font = feature.getStyle().getText().getFont();
+            var color = feature.getStyle().getText().getFill().getColor();
+            var rotation = feature.getStyle().getText().getRotation();
+            myText = "<myText id=\""+id+"\" content=\""+content+"\" font=\""+font+"\" color=\""+color+"\" rotation=\""+rotation+"\"></myText>";
+            myTexts += myText;
+            features.push(feature);
+        });  
+        var format = new ol.format.KML();       
+        var string = format.writeFeatures(features);
+        console.log(string);
+        var pos = string.indexOf("</kml>");
+        console.log(string);
+        var output = string.substr(0,pos) + myTexts + "</kml>";      
+        var base64 = btoa(output);
+        /*****************************************************/  
         /*
         $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string + "&type=insert", dataType: 'jsonp', jsonpCallback: 'handler',
             success: function(response) {
