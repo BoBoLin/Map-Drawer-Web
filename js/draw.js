@@ -683,12 +683,32 @@ $(document).ready(function () {
         var reader = new FileReader();
         reader.onload = function (event) {
             // read feature to layer
-            $kml_str = event.target.result;
+            kml_str = event.target.result;
             var format = new ol.format.KML();
-            console.log(format.readFeatures($kml_str));
-            featureOverlay.getSource().addFeatures(format.readFeatures($kml_str));
+            console.log(format.readFeatures(kml_str));
+            featureOverlay.getSource().addFeatures(format.readFeatures(kml_str));
             featureOverlay.setMap(map);
-
+            /*** handle text import ***/
+            var kml_text = $(kml_str).find("myText");
+            for(var i=0;i<kml_text.size();i++){
+                var feature = featureOverlay.getSource().getFeatureById($(kml_text[i]).attr("id"));
+                var content = $(kml_text[i]).attr("content");
+                var font = $(kml_text[i]).attr("font");
+                var color = $(kml_text[i]).attr("color");
+                var rotation = $(kml_text[i]).attr("rotation");
+                var s = new ol.style.Style({
+                    text: new ol.style.Text({
+                        font: font,
+                        fill: new ol.style.Fill({ color: color }),
+                        stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
+                        rotation: parseFloat(rotation),
+                        text: content,
+                        offsetY: -10
+                    })
+                });                      
+                feature.setStyle(s);                
+            };
+            /*****************************/
             // draw on map
             var load_interaction = new ol.interaction.Modify({
                 features: new ol.Collection(featureOverlay.getSource().getFeatures())
