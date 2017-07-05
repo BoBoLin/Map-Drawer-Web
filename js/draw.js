@@ -6,6 +6,21 @@ var features;
 var modify;
 
 $(document).ready(function () {
+    /********* auto import ***********/
+    var href = location.href;
+    var split_href;
+    var kml_id;
+    if(location.href.indexOf("?") > 0)
+    {
+        split_href = href.split('?');
+        kml_id = split_href[1];
+        import_kml_string(kml_id);
+    }
+    else
+    {
+        kml_id = 0;
+    }
+    /********* !auto import ***********/
 
     /********* component init ***********/
     $('.ui.accordion').accordion({
@@ -577,17 +592,20 @@ $(document).ready(function () {
             var font = feature.getStyle().getText().getFont();
             var color = feature.getStyle().getText().getFill().getColor();
             var rotation = feature.getStyle().getText().getRotation();
-            myText = "<myText id=\""+id+"\" content=\""+content+"\" font=\""+font+"\" color=\""+color+"\" rotation=\""+rotation+"\"></myText>";
-            myTexts += myText;
+            if(content.trim()){ // if text is not empty              
+                myText = "<myText id=\""+id+"\" content=\""+content+"\" font=\""+font+"\" color=\""+color+"\" rotation=\""+rotation+"\"></myText>";
+                myTexts += myText;
+            }
             features.push(feature);
         });
         var format = new ol.format.KML();
         console.log("789");
         var string = format.writeFeatures(features);
-        console.log(string);
         var pos = string.indexOf("</kml>");
+
         console.log(string);
-        var output = string.substr(0,pos) + myTexts + "</kml>";
+        var output = string.substr(0,pos) + myTexts + "</kml>";   
+
         var base64 = btoa(output);
         /*****************************************************/
         /*
@@ -1037,4 +1055,35 @@ function hexToRgbA(hex){
         return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+', 0.5)';
     }
     throw new Error('Bad Hex');
+}
+
+function import_kml_string(kml_str) {
+    featureOverlay.getSource().addFeatures(format.readFeatures(kml_str));
+    featureOverlay.setMap(map);
+    /*** handle text import ***/
+    var kml_text = $(kml_str).find("myText");
+    for(var i=0;i<kml_text.size();i++){
+        var feature = featureOverlay.getSource().getFeatureById($(kml_text[i]).attr("id"));
+        var content = $(kml_text[i]).attr("content");
+        var font = $(kml_text[i]).attr("font");
+        var color = $(kml_text[i]).attr("color");
+        var rotation = $(kml_text[i]).attr("rotation");
+        var s = new ol.style.Style({
+            text: new ol.style.Text({
+                font: font,
+                fill: new ol.style.Fill({ color: color }),
+                stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
+                rotation: parseFloat(rotation),
+                text: content,
+                offsetY: -10
+            })
+        });
+        feature.setStyle(s);
+    };
+    /*****************************/
+    // draw on map
+    var load_interaction = new ol.interaction.Modify({
+        features: new ol.Collection(featureOverlay.getSource().getFeatures())
+    });
+    map.addInteraction(load_interaction);
 }
