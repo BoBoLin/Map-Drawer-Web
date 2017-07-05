@@ -580,22 +580,22 @@ $(document).ready(function () {
             myText = "<myText id=\""+id+"\" content=\""+content+"\" font=\""+font+"\" color=\""+color+"\" rotation=\""+rotation+"\"></myText>";
             myTexts += myText;
             features.push(feature);
-        });  
-        var format = new ol.format.KML();       
+        });
+        var format = new ol.format.KML();
+        console.log("789");
         var string = format.writeFeatures(features);
         console.log(string);
         var pos = string.indexOf("</kml>");
         console.log(string);
-        var output = string.substr(0,pos) + myTexts + "</kml>";      
+        var output = string.substr(0,pos) + myTexts + "</kml>";
         var base64 = btoa(output);
-        /*****************************************************/  
+        /*****************************************************/
         /*
         $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string + "&type=insert", dataType: 'jsonp', jsonpCallback: 'handler',
             success: function(response) {
                 console.log(response);
             }
         });*/
-
       exportKMLElement.href = 'data:application/vnd.google-earth.kml+xml;base64,' + base64;
     }, false);
 
@@ -717,8 +717,8 @@ $(document).ready(function () {
                         text: content,
                         offsetY: -10
                     })
-                });                      
-                feature.setStyle(s);                
+                });
+                feature.setStyle(s);
             };
             /*****************************/
             // draw on map
@@ -807,7 +807,7 @@ function drawLine(){
     text_rotation = parseInt($('#line_text_arc').text())*Math.PI/180;
 
     line_color = $('#line_menu > .fields:nth-child(4)').children(".field:nth-child(2)").children('.color_picker').val();
-    line_width = $('#line_size').val();
+    line_width = parseInt($('#line_size').val());
 
     runBrush("line");
 }
@@ -822,7 +822,7 @@ function drawPolygon(){
     text_rotation = parseInt($('#poly_text_arc').text())*Math.PI/180;
 
     line_color = $('#poly_menu > .fields:nth-child(4)').children(".field:nth-child(2)").children('.color_picker').val();
-    line_width = $("#poly_border_size").val();
+    line_width = parseInt($("#poly_border_size").val());
 
     if ($('#poly_menu > .fields:nth-child(4)').children(".field:nth-child(3)").children('.color_picker').val() == "") {
         plane_color = hexToRgbA("#000000");
