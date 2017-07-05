@@ -14,7 +14,19 @@ $(document).ready(function () {
     {
         split_href = href.split('?');
         kml_id = split_href[1];
-        import_kml_string(kml_id);
+        console.log(kml_id);
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                
+                var obj = this.responseText;
+                console.log(obj);
+                import_kml_string(obj)
+            }
+        };
+        xhttp.open("GET","http://140.116.245.84/geo/Drawer/db_connect.php?type=read&id=" + kml_id, true);
+        xhttp.send();
     }
     else
     {
@@ -657,7 +669,7 @@ $(document).ready(function () {
             features.push(clone);
         });
         var string = new ol.format.KML().writeFeatures(features);
-        var url = 'http://140.116.245.84/geo/Drawer_v2/Drawer/drawer.html?' + time + "" +rand;
+        var url = 'http://140.116.245.84/git/Map-Drawer-Web/drawer.html?' + time + "" +rand;
 
         FB.ui({
             method: 'share',
@@ -686,7 +698,7 @@ $(document).ready(function () {
         });
         var string = new ol.format.KML().writeFeatures(features);
 
-        var url = 'http://140.116.245.84/geo/Drawer_v2/Drawer/drawer.html?' + time + "" +rand;
+        var url = 'http://140.116.245.84/git/Map-Drawer-Web/drawer.html?' + time + "" +rand;
         event.preventDefault();
         var email = '';
         var subject = 'share the geo info';
@@ -1058,6 +1070,7 @@ function hexToRgbA(hex){
 }
 
 function import_kml_string(kml_str) {
+    var format = new ol.format.KML();
     featureOverlay.getSource().addFeatures(format.readFeatures(kml_str));
     featureOverlay.setMap(map);
     /*** handle text import ***/
