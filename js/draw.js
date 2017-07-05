@@ -14,19 +14,31 @@ $(document).ready(function () {
     {
         split_href = href.split('?');
         kml_id = split_href[1];
-        console.log(kml_id);
 
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                
-                var obj = this.responseText;
-                console.log(obj);
-                import_kml_string(obj)
-            }
-        };
-        xhttp.open("GET","http://140.116.245.84/geo/Drawer/db_connect.php?type=read&id=" + kml_id, true);
-        xhttp.send();
+        var formData = {type: "read", id: kml_id}
+        $.ajax({
+            url: "http://140.116.245.84/geo/Drawer/db_connect.php",
+            type: "POST",
+            data: formData,
+            dataType: 'jsonp', 
+            jsonpCallback: 'handler',
+            success: function(response) {
+                console.log(response);
+                if(response.kml == null)
+                {
+                    alert("The information hasn't saved.");
+                    //reload main web
+                    window.location.href = "http://140.116.245.84/git/Map-Drawer-Web/drawer.html";
+                }
+
+                else
+                    import_kml_string(response.kml);
+            }, 
+            error: function (jqXHR, textStatus, errorThrown)
+            {
+                console.log(textStatus, errorThrown);
+            }
+        });
     }
     else
     {
@@ -611,7 +623,6 @@ $(document).ready(function () {
             features.push(feature);
         });
         var format = new ol.format.KML();
-        console.log("789");
         var string = format.writeFeatures(features);
         var pos = string.indexOf("</kml>");
 
@@ -661,25 +672,49 @@ $(document).ready(function () {
         time = dt.getFullYear() +""+(dt.getMonth()+1) +""+ dt.getDate() +""+dt.getHours() +""+ dt.getMinutes() +""+ dt.getSeconds();
         rand = Math.floor((Math.random() * 100000) + 1);
 
-        var vectorSource = featureOverlay.getSource();
+         var vectorSource = featureOverlay.getSource();
         var features = [];
+        /*****************handle text export*******************/
+        var myTexts = "";
         vectorSource.forEachFeature(function(feature) {
-            var clone = feature.clone();
-            clone.setId(feature.getId());  // clone does not set the id
-            features.push(clone);
+            var id = feature.getId();
+            var content = feature.getStyle().getText().getText();
+            var font = feature.getStyle().getText().getFont();
+            var color = feature.getStyle().getText().getFill().getColor();
+            var rotation = feature.getStyle().getText().getRotation();
+            if(content.trim()){ // if text is not empty              
+                myText = "<myText id=\""+id+"\" content=\""+content+"\" font=\""+font+"\" color=\""+color+"\" rotation=\""+rotation+"\"></myText>";
+                myTexts += myText;
+            }
+            features.push(feature);
         });
-        var string = new ol.format.KML().writeFeatures(features);
+        var format = new ol.format.KML();
+        var string = format.writeFeatures(features);
+        var pos = string.indexOf("</kml>");
+        var kml_s = string.substr(0,pos) + myTexts + "</kml>"; 
+
         var url = 'http://140.116.245.84/git/Map-Drawer-Web/drawer.html?' + time + "" +rand;
 
         FB.ui({
             method: 'share',
             href: url ,
         }, function(response){});
+        //console.log(kml_s);
 
-        $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string + "&type=insert" + "&date_str=" + time+ ""+ rand, dataType: 'jsonp', jsonpCallback: 'handler',
+        var formData = {kml_str: kml_s, type: "insert", date_str: time+ ""+ rand}
+        $.ajax({
+            url: "http://140.116.245.84/geo/Drawer/db_connect.php",
+            type: "POST",
+            data: formData,
+            dataType: 'jsonp', 
+            jsonpCallback: 'handler',
             success: function(response) {
                 console.log(response);
-            }
+            }, 
+            error: function (jqXHR, textStatus, errorThrown)
+            {
+                console.log(textStatus, errorThrown);
+            }
         });
     };
 
@@ -688,15 +723,26 @@ $(document).ready(function () {
         time = dt.getFullYear() +""+(dt.getMonth()+1) +""+ dt.getDate() +""+dt.getHours() +""+ dt.getMinutes() +""+ dt.getSeconds();
         rand = Math.floor((Math.random() * 100000) + 1);
 
-        var vectorSource = featureOverlay.getSource();
+         var vectorSource = featureOverlay.getSource();
         var features = [];
+        /*****************handle text export*******************/
+        var myTexts = "";
         vectorSource.forEachFeature(function(feature) {
-            var clone = feature.clone();
-            clone.setId(feature.getId());  // clone does not set the id
-            clone.getGeometry().transform(ol.proj.get('EPSG:3857'), 'EPSG:4326');
-            features.push(clone);
+            var id = feature.getId();
+            var content = feature.getStyle().getText().getText();
+            var font = feature.getStyle().getText().getFont();
+            var color = feature.getStyle().getText().getFill().getColor();
+            var rotation = feature.getStyle().getText().getRotation();
+            if(content.trim()){ // if text is not empty              
+                myText = "<myText id=\""+id+"\"content=\""+content+"\"font=\""+font+"\"color=\""+color+"\"rotation=\""+rotation+"\"></myText>";
+                myTexts += myText;
+            }
+            features.push(feature);
         });
-        var string = new ol.format.KML().writeFeatures(features);
+        var format = new ol.format.KML();
+        var string = format.writeFeatures(features);
+        var pos = string.indexOf("</kml>");
+        var kml_s = string.substr(0,pos) + myTexts + "</kml>"; 
 
         var url = 'http://140.116.245.84/git/Map-Drawer-Web/drawer.html?' + time + "" +rand;
         event.preventDefault();
@@ -705,11 +751,30 @@ $(document).ready(function () {
         var emailBody = 'url: ' + url;
         window.location = 'mailto:' + email + '?subject=' + subject + '&body=' + emailBody;
 
-        $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string + "&type=insert" + "&date_str=" + time+ ""+ rand, dataType: 'jsonp', jsonpCallback: 'handler',
+        var formData = {kml_str: kml_s, type: "insert", date_str: time+ ""+ rand}
+        /*
+        $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string_mytext + "&type=insert" + "&date_str=" + time+ ""+ rand, dataType: 'jsonp', jsonpCallback: 'handler',
             success: function(response) {
                 console.log(response);
             }
         });
+        */
+        $.ajax({
+            url: "http://140.116.245.84/geo/Drawer/db_connect.php",
+            type: "POST",
+            data: formData,
+            dataType: 'jsonp', 
+            jsonpCallback: 'handler',
+            success: function(response) {
+                console.log(response);
+            }, 
+            error: function (jqXHR, textStatus, errorThrown)
+            {
+                console.log(textStatus, errorThrown);
+            }
+        });
+
+        
     });
     /*************** !share **************/
 
@@ -1093,10 +1158,12 @@ function import_kml_string(kml_str) {
         });
         feature.setStyle(s);
     };
+
     /*****************************/
     // draw on map
     var load_interaction = new ol.interaction.Modify({
         features: new ol.Collection(featureOverlay.getSource().getFeatures())
     });
     map.addInteraction(load_interaction);
+
 }
