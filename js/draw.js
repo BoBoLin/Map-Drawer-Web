@@ -629,7 +629,8 @@ $(document).ready(function () {
         var string = format.writeFeatures(features);
         var pos = string.indexOf("</kml>");
         var output = string.substr(0,pos) + myTexts + "</kml>";
-        var base64 = btoa(output);
+
+        var base64 = btoa(unescape(encodeURIComponent(output)));
         /*****************************************************/
         /*
         $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string + "&type=insert", dataType: 'jsonp', jsonpCallback: 'handler',
