@@ -834,7 +834,7 @@ $(document).ready(function () {
                         text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
                         text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
                         isIcon = true;
-                        icon_url = $(objs[i]).find("Style").find("IconStyle").find("Icon").find("href");
+                        icon_url = $(objs[i]).find("Style").find("IconStyle").find("Icon").find("href").text();
                     break;
                 }
                 var s = new ol.style.Style({
@@ -1252,7 +1252,7 @@ function import_kml_string(kml_str) {
                 text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
                 text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
                 isIcon = true;
-                icon_url = $(objs[i]).find("Style").find("IconStyle").find("Icon").find("href");
+                icon_url = $(objs[i]).find("Style").find("IconStyle").find("Icon").find("href").text();
             break;
         }
         var s = new ol.style.Style({
