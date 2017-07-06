@@ -20,7 +20,7 @@ $(document).ready(function () {
             url: "http://140.116.245.84/geo/Drawer/db_connect.php",
             type: "POST",
             data: formData,
-            dataType: 'jsonp', 
+            dataType: 'jsonp',
             jsonpCallback: 'handler',
             success: function(response) {
                 console.log(response);
@@ -33,7 +33,7 @@ $(document).ready(function () {
 
                 else
                     import_kml_string(response.kml);
-            }, 
+            },
             error: function (jqXHR, textStatus, errorThrown)
             {
                 console.log(textStatus, errorThrown);
@@ -294,7 +294,7 @@ $(document).ready(function () {
                         "</div>" +
                         "<div class='field'>" +
                             "<label>內容</label>" +
-                            "<input type='text' id='update_text_content' val='" + text_style.getText() + "'/>" +
+                            "<input type='text' id='update_text_content' value='" + text_style.getText() + "'/>" +
                         "</div>" +
                         "<div class='fields'>" +
                             "<div class='field'>" +
@@ -524,14 +524,18 @@ $(document).ready(function () {
             case 'warning':
                 var text_style = feature.getStyle().getText();
                 var new_style = new ol.style.Style({
-                    image: (($("input[name=update_point_icon]:checked").val()=="none")? "" :
-                            new ol.style.Icon(({
-                                anchor: [0.5, 46],
-                                anchorXUnits: 'fraction',
-                                anchorYUnits: 'pixels',
-                                scale: 0.125,
-                                src: $("input[name=update_point_icon]:checked").val(),
-                            }))),
+                    image: (($("input[name=update_point_icon]:checked").val()=="none")?
+                                new ol.style.Circle({
+                                    radius: point_radius,
+                                    fill: new ol.style.Fill({ color: point_color,})
+                                }) :
+                                new ol.style.Icon({
+                                    anchor: [0.5, 46],
+                                    anchorXUnits: 'fraction',
+                                    anchorYUnits: 'pixels',
+                                    scale: 0.125,
+                                    src: $("input[name=update_point_icon]:checked").val(),
+                                })),
                     stroke: new ol.style.Stroke({
                         color: "",
                         width: "",
@@ -616,7 +620,7 @@ $(document).ready(function () {
             var font = feature.getStyle().getText().getFont();
             var color = feature.getStyle().getText().getFill().getColor();
             var rotation = feature.getStyle().getText().getRotation();
-            if(content.trim()){ // if text is not empty              
+            if(content.trim()){ // if text is not empty
                 myText = "<myText id=\""+id+"\" content=\""+content+"\" font=\""+font+"\" color=\""+color+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
             }
@@ -627,7 +631,7 @@ $(document).ready(function () {
         var pos = string.indexOf("</kml>");
 
         console.log(string);
-        var output = string.substr(0,pos) + myTexts + "</kml>";   
+        var output = string.substr(0,pos) + myTexts + "</kml>";
 
         var base64 = btoa(output);
         /*****************************************************/
@@ -682,7 +686,7 @@ $(document).ready(function () {
             var font = feature.getStyle().getText().getFont();
             var color = feature.getStyle().getText().getFill().getColor();
             var rotation = feature.getStyle().getText().getRotation();
-            if(content.trim()){ // if text is not empty              
+            if(content.trim()){ // if text is not empty
                 myText = "<myText id=\""+id+"\" content=\""+content+"\" font=\""+font+"\" color=\""+color+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
             }
@@ -691,7 +695,7 @@ $(document).ready(function () {
         var format = new ol.format.KML();
         var string = format.writeFeatures(features);
         var pos = string.indexOf("</kml>");
-        var kml_s = string.substr(0,pos) + myTexts + "</kml>"; 
+        var kml_s = string.substr(0,pos) + myTexts + "</kml>";
 
         var url = 'http://140.116.245.84/git/Map-Drawer-Web/drawer.html?' + time + "" +rand;
 
@@ -706,11 +710,11 @@ $(document).ready(function () {
             url: "http://140.116.245.84/geo/Drawer/db_connect.php",
             type: "POST",
             data: formData,
-            dataType: 'jsonp', 
+            dataType: 'jsonp',
             jsonpCallback: 'handler',
             success: function(response) {
                 console.log(response);
-            }, 
+            },
             error: function (jqXHR, textStatus, errorThrown)
             {
                 console.log(textStatus, errorThrown);
@@ -733,7 +737,7 @@ $(document).ready(function () {
             var font = feature.getStyle().getText().getFont();
             var color = feature.getStyle().getText().getFill().getColor();
             var rotation = feature.getStyle().getText().getRotation();
-            if(content.trim()){ // if text is not empty              
+            if(content.trim()){ // if text is not empty
                 myText = "<myText id=\""+id+"\"content=\""+content+"\"font=\""+font+"\"color=\""+color+"\"rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
             }
@@ -742,7 +746,7 @@ $(document).ready(function () {
         var format = new ol.format.KML();
         var string = format.writeFeatures(features);
         var pos = string.indexOf("</kml>");
-        var kml_s = string.substr(0,pos) + myTexts + "</kml>"; 
+        var kml_s = string.substr(0,pos) + myTexts + "</kml>";
 
         var url = 'http://140.116.245.84/git/Map-Drawer-Web/drawer.html?' + time + "" +rand;
         event.preventDefault();
@@ -763,18 +767,18 @@ $(document).ready(function () {
             url: "http://140.116.245.84/geo/Drawer/db_connect.php",
             type: "POST",
             data: formData,
-            dataType: 'jsonp', 
+            dataType: 'jsonp',
             jsonpCallback: 'handler',
             success: function(response) {
                 console.log(response);
-            }, 
+            },
             error: function (jqXHR, textStatus, errorThrown)
             {
                 console.log(textStatus, errorThrown);
             }
         });
 
-        
+
     });
     /*************** !share **************/
 
