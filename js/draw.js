@@ -20,7 +20,7 @@ $(document).ready(function () {
             url: "http://140.116.245.84/geo/Drawer/db_connect.php",
             type: "POST",
             data: formData,
-            dataType: 'jsonp', 
+            dataType: 'jsonp',
             jsonpCallback: 'handler',
             success: function(response) {
                 console.log(response);
@@ -33,7 +33,7 @@ $(document).ready(function () {
 
                 else
                     import_kml_string(response.kml);
-            }, 
+            },
             error: function (jqXHR, textStatus, errorThrown)
             {
                 console.log(textStatus, errorThrown);
@@ -294,7 +294,7 @@ $(document).ready(function () {
                         "</div>" +
                         "<div class='field'>" +
                             "<label>內容</label>" +
-                            "<input type='text' id='update_text_content' val='" + text_style.getText() + "'/>" +
+                            "<input type='text' id='update_text_content' value='" + text_style.getText() + "'/>" +
                         "</div>" +
                         "<div class='fields'>" +
                             "<div class='field'>" +
@@ -524,14 +524,18 @@ $(document).ready(function () {
             case 'warning':
                 var text_style = feature.getStyle().getText();
                 var new_style = new ol.style.Style({
-                    image: (($("input[name=update_point_icon]:checked").val()=="none")? "" :
-                            new ol.style.Icon(({
-                                anchor: [0.5, 46],
-                                anchorXUnits: 'fraction',
-                                anchorYUnits: 'pixels',
-                                scale: 0.125,
-                                src: $("input[name=update_point_icon]:checked").val(),
-                            }))),
+                    image: (($("input[name=update_point_icon]:checked").val()=="none")?
+                                new ol.style.Circle({
+                                    radius: point_radius,
+                                    fill: new ol.style.Fill({ color: point_color,})
+                                }) :
+                                new ol.style.Icon({
+                                    anchor: [0.5, 46],
+                                    anchorXUnits: 'fraction',
+                                    anchorYUnits: 'pixels',
+                                    scale: 0.125,
+                                    src: $("input[name=update_point_icon]:checked").val(),
+                                })),
                     stroke: new ol.style.Stroke({
                         color: "",
                         width: "",
@@ -614,7 +618,8 @@ $(document).ready(function () {
             var id = feature.getId();
             var font = feature.getStyle().getText().getFont();
             var rotation = feature.getStyle().getText().getRotation();
-            if(content.trim()){ // if text is not empty              
+
+            if(content.trim()){ // if text is not empty
                 myText = "<myText id=\""+id+"\" font=\""+font+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
             }
@@ -623,7 +628,7 @@ $(document).ready(function () {
         var format = new ol.format.KML();
         var string = format.writeFeatures(features);
         var pos = string.indexOf("</kml>");
-        var output = string.substr(0,pos) + myTexts + "</kml>";   
+        var output = string.substr(0,pos) + myTexts + "</kml>";
         var base64 = btoa(output);
         /*****************************************************/
         /*
@@ -675,7 +680,8 @@ $(document).ready(function () {
             var id = feature.getId();
             var font = feature.getStyle().getText().getFont();
             var rotation = feature.getStyle().getText().getRotation();
-            if(content.trim()){ // if text is not empty              
+
+            if(content.trim()){ // if text is not empty
                 myText = "<myText id=\""+id+"\" font=\""+font+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
             }
@@ -684,7 +690,7 @@ $(document).ready(function () {
         var format = new ol.format.KML();
         var string = format.writeFeatures(features);
         var pos = string.indexOf("</kml>");
-        var kml_s = string.substr(0,pos) + myTexts + "</kml>";   
+        var kml_s = string.substr(0,pos) + myTexts + "</kml>";
 
         var url = 'http://140.116.245.84/git/Map-Drawer-Web/drawer.html?' + time + "" +rand;
 
@@ -699,11 +705,11 @@ $(document).ready(function () {
             url: "http://140.116.245.84/geo/Drawer/db_connect.php",
             type: "POST",
             data: formData,
-            dataType: 'jsonp', 
+            dataType: 'jsonp',
             jsonpCallback: 'handler',
             success: function(response) {
                 console.log(response);
-            }, 
+            },
             error: function (jqXHR, textStatus, errorThrown)
             {
                 console.log(textStatus, errorThrown);
@@ -724,7 +730,7 @@ $(document).ready(function () {
             var id = feature.getId();
             var font = feature.getStyle().getText().getFont();
             var rotation = feature.getStyle().getText().getRotation();
-            if(content.trim()){ // if text is not empty              
+            if(content.trim()){ // if text is not empty
                 myText = "<myText id=\""+id+"\" font=\""+font+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
             }
@@ -733,7 +739,7 @@ $(document).ready(function () {
         var format = new ol.format.KML();
         var string = format.writeFeatures(features);
         var pos = string.indexOf("</kml>");
-        var kml_s = string.substr(0,pos) + myTexts + "</kml>";  
+        var kml_s = string.substr(0,pos) + myTexts + "</kml>";
 
         var url = 'http://140.116.245.84/git/Map-Drawer-Web/drawer.html?' + time + "" +rand;
         event.preventDefault();
@@ -754,18 +760,18 @@ $(document).ready(function () {
             url: "http://140.116.245.84/geo/Drawer/db_connect.php",
             type: "POST",
             data: formData,
-            dataType: 'jsonp', 
+            dataType: 'jsonp',
             jsonpCallback: 'handler',
             success: function(response) {
                 console.log(response);
-            }, 
+            },
             error: function (jqXHR, textStatus, errorThrown)
             {
                 console.log(textStatus, errorThrown);
             }
         });
 
-        
+
     });
     /*************** !share **************/
 
@@ -781,15 +787,15 @@ $(document).ready(function () {
         var reader = new FileReader();
         reader.onload = function (event) {
             // read feature to layer
-            kml_str = event.target.result;            
+            kml_str = event.target.result;
             var format = new ol.format.KML();
             featureOverlay.getSource().addFeatures(format.readFeatures(kml_str));
-            featureOverlay.setMap(map);            
+            featureOverlay.setMap(map);
             var x = $.parseXML(kml_str);
             var objs = $(x).find("Placemark");
             for(var i=0;i<objs.size();i++){
-                var id = $(objs[i]).attr("id");  
-                setDefaultFeatures();            
+                var id = $(objs[i]).attr("id");
+                setDefaultFeatures();
                 switch((id.split(' '))[0]){
                     case 'font':
                         type = "Point";
@@ -798,7 +804,7 @@ $(document).ready(function () {
                         text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
                         text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
                         isIcon = false;
-                    break;                    
+                    break;
                     case 'line':
                         type = "LineString";
                         text_content = $(objs[i]).find("name").text();
@@ -847,10 +853,10 @@ $(document).ready(function () {
                         text: text_content,
                         offsetY: -10
                     })
-                });  
-                var feature = featureOverlay.getSource().getFeatureById(id); 
+                });
+                var feature = featureOverlay.getSource().getFeatureById(id);
                 console.log(feature);
-                feature.setStyle(s);  
+                feature.setStyle(s);
                 var draw_type = (id.split(' '))[0];
                 var $cnt = (id.split(' '))[1];
                 $("#editor > tbody").append(
@@ -873,13 +879,13 @@ $(document).ready(function () {
                             "<button class='ui icon remove button'><i class='remove icon'></i></button>" +
                         "</td>" +
                     "</tr>"
-                );                
+                );
             };
             // draw on map
             var load_interaction = new ol.interaction.Modify({
                 features: new ol.Collection(featureOverlay.getSource().getFeatures())
             });
-            map.addInteraction(load_interaction);                 
+            map.addInteraction(load_interaction);
         };
         reader.readAsText(uploader_dom.files[0]);
     });
@@ -889,7 +895,7 @@ function kmlColorCodeToHex(code){
     var r = code[6]+code[7];
     var g = code[4]+code[5];
     var b = code[2]+code[3];
-    return "#"+r+g+b; 
+    return "#"+r+g+b;
 }
 // global variable
 var draw;
@@ -1202,12 +1208,12 @@ function hexToRgbA(hex){
 function import_kml_string(kml_str) {
     var format = new ol.format.KML();
     featureOverlay.getSource().addFeatures(format.readFeatures(kml_str));
-    featureOverlay.setMap(map);            
+    featureOverlay.setMap(map);
     var x = $.parseXML(kml_str);
     var objs = $(x).find("Placemark");
     for(var i=0;i<objs.size();i++){
-        var id = $(objs[i]).attr("id");  
-        setDefaultFeatures();            
+        var id = $(objs[i]).attr("id");
+        setDefaultFeatures();
         switch((id.split(' '))[0]){
             case 'font':
                 type = "Point";
@@ -1216,7 +1222,7 @@ function import_kml_string(kml_str) {
                 text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
                 text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
                 isIcon = false;
-            break;                    
+            break;
             case 'line':
                 type = "LineString";
                 text_content = $(objs[i]).find("name").text();
@@ -1265,10 +1271,10 @@ function import_kml_string(kml_str) {
                 text: text_content,
                 offsetY: -10
             })
-        });  
-        var feature = featureOverlay.getSource().getFeatureById(id); 
+        });
+        var feature = featureOverlay.getSource().getFeatureById(id);
         console.log(feature);
-        feature.setStyle(s);  
+        feature.setStyle(s);
         var draw_type = (id.split(' '))[0];
         var $cnt = (id.split(' '))[1];
         $("#editor > tbody").append(
@@ -1291,11 +1297,11 @@ function import_kml_string(kml_str) {
                     "<button class='ui icon remove button'><i class='remove icon'></i></button>" +
                 "</td>" +
             "</tr>"
-        );                
+        );
     };
     // draw on map
     var load_interaction = new ol.interaction.Modify({
         features: new ol.Collection(featureOverlay.getSource().getFeatures())
     });
-    map.addInteraction(load_interaction);   
+    map.addInteraction(load_interaction);
 }
