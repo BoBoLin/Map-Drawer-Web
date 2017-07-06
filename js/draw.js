@@ -618,7 +618,7 @@ $(document).ready(function () {
             var id = feature.getId();
             var font = feature.getStyle().getText().getFont();
             var rotation = feature.getStyle().getText().getRotation();
-
+            var content = feature.getStyle().getText().getText();
             if(content.trim()){ // if text is not empty
                 myText = "<myText id=\""+id+"\" font=\""+font+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
@@ -680,7 +680,7 @@ $(document).ready(function () {
             var id = feature.getId();
             var font = feature.getStyle().getText().getFont();
             var rotation = feature.getStyle().getText().getRotation();
-
+            var content = feature.getStyle().getText().getText();
             if(content.trim()){ // if text is not empty
                 myText = "<myText id=\""+id+"\" font=\""+font+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
@@ -730,6 +730,7 @@ $(document).ready(function () {
             var id = feature.getId();
             var font = feature.getStyle().getText().getFont();
             var rotation = feature.getStyle().getText().getRotation();
+            var content = feature.getStyle().getText().getText();
             if(content.trim()){ // if text is not empty
                 myText = "<myText id=\""+id+"\" font=\""+font+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
