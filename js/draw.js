@@ -616,12 +616,11 @@ $(document).ready(function () {
         var myTexts = "";
         vectorSource.forEachFeature(function(feature) {
             var id = feature.getId();
-            var content = feature.getStyle().getText().getText();
             var font = feature.getStyle().getText().getFont();
-            var color = feature.getStyle().getText().getFill().getColor();
             var rotation = feature.getStyle().getText().getRotation();
+
             if(content.trim()){ // if text is not empty
-                myText = "<myText id=\""+id+"\" content=\""+content+"\" font=\""+font+"\" color=\""+color+"\" rotation=\""+rotation+"\"></myText>";
+                myText = "<myText id=\""+id+"\" font=\""+font+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
             }
             features.push(feature);
@@ -629,10 +628,7 @@ $(document).ready(function () {
         var format = new ol.format.KML();
         var string = format.writeFeatures(features);
         var pos = string.indexOf("</kml>");
-
-        console.log(string);
         var output = string.substr(0,pos) + myTexts + "</kml>";
-
         var base64 = btoa(output);
         /*****************************************************/
         /*
@@ -682,12 +678,11 @@ $(document).ready(function () {
         var myTexts = "";
         vectorSource.forEachFeature(function(feature) {
             var id = feature.getId();
-            var content = feature.getStyle().getText().getText();
             var font = feature.getStyle().getText().getFont();
-            var color = feature.getStyle().getText().getFill().getColor();
             var rotation = feature.getStyle().getText().getRotation();
+
             if(content.trim()){ // if text is not empty
-                myText = "<myText id=\""+id+"\" content=\""+content+"\" font=\""+font+"\" color=\""+color+"\" rotation=\""+rotation+"\"></myText>";
+                myText = "<myText id=\""+id+"\" font=\""+font+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
             }
             features.push(feature);
@@ -733,12 +728,10 @@ $(document).ready(function () {
         var myTexts = "";
         vectorSource.forEachFeature(function(feature) {
             var id = feature.getId();
-            var content = feature.getStyle().getText().getText();
             var font = feature.getStyle().getText().getFont();
-            var color = feature.getStyle().getText().getFill().getColor();
             var rotation = feature.getStyle().getText().getRotation();
             if(content.trim()){ // if text is not empty
-                myText = "<myText id=\""+id+"\"content=\""+content+"\"font=\""+font+"\"color=\""+color+"\"rotation=\""+rotation+"\"></myText>";
+                myText = "<myText id=\""+id+"\" font=\""+font+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
             }
             features.push(feature);
@@ -790,36 +783,104 @@ $(document).ready(function () {
         console.log(uploader_dom.files[0].size + " bytes");
         console.log(uploader_dom.files[0].type);
 
-        var $kml_str = "";
+        var kml_str = "";
         var reader = new FileReader();
         reader.onload = function (event) {
             // read feature to layer
             kml_str = event.target.result;
             var format = new ol.format.KML();
-            console.log(format.readFeatures(kml_str));
             featureOverlay.getSource().addFeatures(format.readFeatures(kml_str));
             featureOverlay.setMap(map);
-            /*** handle text import ***/
-            var kml_text = $(kml_str).find("myText");
-            for(var i=0;i<kml_text.size();i++){
-                var feature = featureOverlay.getSource().getFeatureById($(kml_text[i]).attr("id"));
-                var content = $(kml_text[i]).attr("content");
-                var font = $(kml_text[i]).attr("font");
-                var color = $(kml_text[i]).attr("color");
-                var rotation = $(kml_text[i]).attr("rotation");
+            var x = $.parseXML(kml_str);
+            var objs = $(x).find("Placemark");
+            for(var i=0;i<objs.size();i++){
+                var id = $(objs[i]).attr("id");
+                setDefaultFeatures();
+                switch((id.split(' '))[0]){
+                    case 'font':
+                        type = "Point";
+                        text_content = $(objs[i]).find("name").text();
+                        text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
+                        text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                        text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                        isIcon = false;
+                    break;
+                    case 'line':
+                        type = "LineString";
+                        text_content = $(objs[i]).find("name").text();
+                        text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
+                        text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                        text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                        isIcon = false;
+                        line_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LineStyle").find("color").text());
+                        line_width = $(objs[i]).find("Style").find("LineStyle").find("width").text();
+                    break;
+                    case 'polygon':
+                        type = "Polygon";
+                        text_content = $(objs[i]).find("name").text();
+                        text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
+                        text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                        text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                        isIcon = false;
+                        line_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LineStyle").find("color").text());
+                        line_width = $(objs[i]).find("Style").find("LineStyle").find("width").text();
+                        plane_color = hexToRgbA(kmlColorCodeToHex($(objs[i]).find("Style").find("PolyStyle").find("color").text()));
+                    break;
+                    case 'h':
+                        type = "Point";
+                        text_content = $(objs[i]).find("name").text();
+                        text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
+                        text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                        text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                        isIcon = true;
+                        icon_url = $(objs[i]).find("Style").find("IconStyle").find("Icon").find("href");
+                    break;
+                }
                 var s = new ol.style.Style({
+                    image: getImage(),
+                    stroke: new ol.style.Stroke({
+                        color: line_color,
+                        width: line_width,
+                    }),
+                    fill: new ol.style.Fill({
+                        color: plane_color,
+                    }),
                     text: new ol.style.Text({
-                        font: font,
-                        fill: new ol.style.Fill({ color: color }),
-                        stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
-                        rotation: parseFloat(rotation),
-                        text: content,
+                        font: text_size,
+                        fill: new ol.style.Fill({ color: text_color }),
+                        stroke: new ol.style.Stroke({color: 'yellow', width: 0.8}),
+                        rotation: text_rotation,
+                        text: text_content,
                         offsetY: -10
                     })
                 });
+                var feature = featureOverlay.getSource().getFeatureById(id);
+                console.log(feature);
                 feature.setStyle(s);
+                var draw_type = (id.split(' '))[0];
+                var $cnt = (id.split(' '))[1];
+                $("#editor > tbody").append(
+                    "<tr>" +
+                        "<td>" +
+                            "<h2 class='ui center aligned header'>" + $cnt + "</h2>" +
+                            "<div style='display: none;'>" + (draw_type + " " + $cnt) + "</div>" +
+                        "</td>" +
+                        "<td>" +
+                            "<i class='" + ((draw_type=="line")? "arrow left" : (draw_type=="polygon")? "square outline" : draw_type) + " icon'></i>" +
+                            "(" + text_content + ")" +
+                        "</td>" +
+                        "<td>" +
+                            "<button class='ui icon search button'><i class='search icon'></i></button>" +
+                        "</td>" +
+                        "<td>" +
+                            "<button class='ui icon edit button'><i class='edit icon'></i></button>" +
+                        "</td>" +
+                        "<td>" +
+                            "<button class='ui icon remove button'><i class='remove icon'></i></button>" +
+                        "</td>" +
+                    "</tr>"
+                );
             };
-            /*****************************/
             // draw on map
             var load_interaction = new ol.interaction.Modify({
                 features: new ol.Collection(featureOverlay.getSource().getFeatures())
@@ -830,6 +891,12 @@ $(document).ready(function () {
     });
 });
 
+function kmlColorCodeToHex(code){
+    var r = code[6]+code[7];
+    var g = code[4]+code[5];
+    var b = code[2]+code[3];
+    return "#"+r+g+b;
+}
 // global variable
 var draw;
 var type;
@@ -1142,32 +1209,99 @@ function import_kml_string(kml_str) {
     var format = new ol.format.KML();
     featureOverlay.getSource().addFeatures(format.readFeatures(kml_str));
     featureOverlay.setMap(map);
-    /*** handle text import ***/
-    var kml_text = $(kml_str).find("myText");
-    for(var i=0;i<kml_text.size();i++){
-        var feature = featureOverlay.getSource().getFeatureById($(kml_text[i]).attr("id"));
-        var content = $(kml_text[i]).attr("content");
-        var font = $(kml_text[i]).attr("font");
-        var color = $(kml_text[i]).attr("color");
-        var rotation = $(kml_text[i]).attr("rotation");
+    var x = $.parseXML(kml_str);
+    var objs = $(x).find("Placemark");
+    for(var i=0;i<objs.size();i++){
+        var id = $(objs[i]).attr("id");
+        setDefaultFeatures();
+        switch((id.split(' '))[0]){
+            case 'font':
+                type = "Point";
+                text_content = $(objs[i]).find("name").text();
+                text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
+                text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                isIcon = false;
+            break;
+            case 'line':
+                type = "LineString";
+                text_content = $(objs[i]).find("name").text();
+                text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
+                text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                isIcon = false;
+                line_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LineStyle").find("color").text());
+                line_width = $(objs[i]).find("Style").find("LineStyle").find("width").text();
+            break;
+            case 'polygon':
+                type = "Polygon";
+                text_content = $(objs[i]).find("name").text();
+                text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
+                text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                isIcon = false;
+                line_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LineStyle").find("color").text());
+                line_width = $(objs[i]).find("Style").find("LineStyle").find("width").text();
+                plane_color = hexToRgbA(kmlColorCodeToHex($(objs[i]).find("Style").find("PolyStyle").find("color").text()));
+            break;
+            case 'h':
+                type = "Point";
+                text_content = $(objs[i]).find("name").text();
+                text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
+                text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                isIcon = true;
+                icon_url = $(objs[i]).find("Style").find("IconStyle").find("Icon").find("href");
+            break;
+        }
         var s = new ol.style.Style({
+            image: getImage(),
+            stroke: new ol.style.Stroke({
+                color: line_color,
+                width: line_width,
+            }),
+            fill: new ol.style.Fill({
+                color: plane_color,
+            }),
             text: new ol.style.Text({
-                font: font,
-                fill: new ol.style.Fill({ color: color }),
-                stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
-                rotation: parseFloat(rotation),
-                text: content,
+                font: text_size,
+                fill: new ol.style.Fill({ color: text_color }),
+                stroke: new ol.style.Stroke({color: 'yellow', width: 0.8}),
+                rotation: text_rotation,
+                text: text_content,
                 offsetY: -10
             })
         });
+        var feature = featureOverlay.getSource().getFeatureById(id);
+        console.log(feature);
         feature.setStyle(s);
+        var draw_type = (id.split(' '))[0];
+        var $cnt = (id.split(' '))[1];
+        $("#editor > tbody").append(
+            "<tr>" +
+                "<td>" +
+                    "<h2 class='ui center aligned header'>" + $cnt + "</h2>" +
+                    "<div style='display: none;'>" + (draw_type + " " + $cnt) + "</div>" +
+                "</td>" +
+                "<td>" +
+                    "<i class='" + ((draw_type=="line")? "arrow left" : (draw_type=="polygon")? "square outline" : draw_type) + " icon'></i>" +
+                    "(" + text_content + ")" +
+                "</td>" +
+                "<td>" +
+                    "<button class='ui icon search button'><i class='search icon'></i></button>" +
+                "</td>" +
+                "<td>" +
+                    "<button class='ui icon edit button'><i class='edit icon'></i></button>" +
+                "</td>" +
+                "<td>" +
+                    "<button class='ui icon remove button'><i class='remove icon'></i></button>" +
+                "</td>" +
+            "</tr>"
+        );
     };
-
-    /*****************************/
     // draw on map
     var load_interaction = new ol.interaction.Modify({
         features: new ol.Collection(featureOverlay.getSource().getFeatures())
     });
     map.addInteraction(load_interaction);
-
 }
