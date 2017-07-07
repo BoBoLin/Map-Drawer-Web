@@ -248,10 +248,10 @@ $(document).ready(function () {
         var feature = featureOverlay.getSource().getFeatureById(feature_id);
         if (feature_id.split(' ')[0] == "polygon") {
             var coord = feature.getGeometry().getCoordinates()[0][0];
-        }else if(feature_id.split(' ')[0] == "font"){
-            var coord = feature.getGeometry().getCoordinates();
-        }else{
+        }else if(feature_id.split(' ')[0] == "line"){
             var coord = feature.getGeometry().getCoordinates()[0];
+        }else{
+            var coord = feature.getGeometry().getCoordinates();
         }
         coord[1] += 7000;
         popup_overlay.setPosition(coord);
