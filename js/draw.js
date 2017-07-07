@@ -998,7 +998,6 @@ function drawPolygon(){
     }else{
         plane_color = hexToRgbA($('#poly_menu > .fields:nth-child(4)').children(".field:nth-child(3)").children('.color_picker').val());
     }
-
     runBrush("polygon");
 }
 
