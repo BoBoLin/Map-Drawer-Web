@@ -616,11 +616,11 @@ $(document).ready(function () {
         var myTexts = "";
         vectorSource.forEachFeature(function(feature) {
             var id = feature.getId();
-            var font = feature.getStyle().getText().getFont();
+            var size = feature.getStyle().getText().getFont().replace("Microsoft Yahei,sans-serif","");
             var rotation = feature.getStyle().getText().getRotation();
             var content = feature.getStyle().getText().getText();
             if(content.trim()){ // if text is not empty
-                myText = "<myText id=\""+id+"\" font=\""+font+"\" rotation=\""+rotation+"\"></myText>";
+                myText = "<myText id=\""+id+"\" size=\""+size+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
             }
             features.push(feature);
@@ -679,11 +679,11 @@ $(document).ready(function () {
         var myTexts = "";
         vectorSource.forEachFeature(function(feature) {
             var id = feature.getId();
-            var font = feature.getStyle().getText().getFont();
+            var size = feature.getStyle().getText().getFont().replace("Microsoft Yahei,sans-serif","");;
             var rotation = feature.getStyle().getText().getRotation();
             var content = feature.getStyle().getText().getText();
             if(content.trim()){ // if text is not empty
-                myText = "<myText id=\""+id+"\" font=\""+font+"\" rotation=\""+rotation+"\"></myText>";
+                myText = "<myText id=\""+id+"\" size=\""+size+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
             }
             features.push(feature);
@@ -729,11 +729,11 @@ $(document).ready(function () {
         var myTexts = "";
         vectorSource.forEachFeature(function(feature) {
             var id = feature.getId();
-            var font = feature.getStyle().getText().getFont();
+            var size = feature.getStyle().getText().getFont().replace("Microsoft Yahei,sans-serif","");;
             var rotation = feature.getStyle().getText().getRotation();
             var content = feature.getStyle().getText().getText();
             if(content.trim()){ // if text is not empty
-                myText = "<myText id=\""+id+"\" font=\""+font+"\" rotation=\""+rotation+"\"></myText>";
+                myText = "<myText id=\""+id+"\" size=\""+size+"\" rotation=\""+rotation+"\"></myText>";
                 myTexts += myText;
             }
             features.push(feature);
@@ -803,7 +803,7 @@ $(document).ready(function () {
                         type = "Point";
                         text_content = $(objs[i]).find("name").text();
                         text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
-                        text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                        text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
                         text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
                         isIcon = false;
                     break;
@@ -811,28 +811,30 @@ $(document).ready(function () {
                         type = "LineString";
                         text_content = $(objs[i]).find("name").text();
                         text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
-                        text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                        text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
                         text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
                         isIcon = false;
                         line_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LineStyle").find("color").text());
-                        line_width = $(objs[i]).find("Style").find("LineStyle").find("width").text();
+                        line_width = parseInt($(objs[i]).find("Style").find("LineStyle").find("width").text());
                     break;
                     case 'polygon':
                         type = "Polygon";
                         text_content = $(objs[i]).find("name").text();
                         text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
-                        text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                        text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
                         text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
                         isIcon = false;
                         line_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LineStyle").find("color").text());
-                        line_width = $(objs[i]).find("Style").find("LineStyle").find("width").text();
+                        line_width = parseInt($(objs[i]).find("Style").find("LineStyle").find("width").text());
                         plane_color = hexToRgbA(kmlColorCodeToHex($(objs[i]).find("Style").find("PolyStyle").find("color").text()));
                     break;
+                    case 'home':
                     case 'h':
+                    case 'warning':
                         type = "Point";
                         text_content = $(objs[i]).find("name").text();
                         text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
-                        text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                        text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
                         text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
                         isIcon = true;
                         icon_url = $(objs[i]).find("Style").find("IconStyle").find("Icon").find("href").text();
@@ -848,7 +850,7 @@ $(document).ready(function () {
                         color: plane_color,
                     }),
                     text: new ol.style.Text({
-                        font: text_size,
+                        font: text_size+" Microsoft Yahei,sans-serif",
                         fill: new ol.style.Fill({ color: text_color }),
                         stroke: new ol.style.Stroke({color: 'yellow', width: 0.8}),
                         rotation: text_rotation,
@@ -857,7 +859,6 @@ $(document).ready(function () {
                     })
                 });
                 var feature = featureOverlay.getSource().getFeatureById(id);
-                console.log(feature);
                 feature.setStyle(s);
                 var draw_type = (id.split(' '))[0];
                 var $cnt = (id.split(' '))[1];
@@ -1020,7 +1021,6 @@ function drawIconText(/*content,color,size,rotation*/){
     text_size = $('#point_text_size').val();//size;
     text_rotation = parseInt($('#point_text_arc').html())*Math.PI/180;
     var draw_type = "font";
-
     if ($("input[name=point_icon]:checked").val() != "none") {
         icon_url = $("input[name=point_icon]:checked").val();
         isIcon = true;
@@ -1221,7 +1221,7 @@ function import_kml_string(kml_str) {
                 type = "Point";
                 text_content = $(objs[i]).find("name").text();
                 text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
-                text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
                 text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
                 isIcon = false;
             break;
@@ -1229,28 +1229,30 @@ function import_kml_string(kml_str) {
                 type = "LineString";
                 text_content = $(objs[i]).find("name").text();
                 text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
-                text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
                 text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
                 isIcon = false;
                 line_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LineStyle").find("color").text());
-                line_width = $(objs[i]).find("Style").find("LineStyle").find("width").text();
+                line_width = parseInt($(objs[i]).find("Style").find("LineStyle").find("width").text());
             break;
             case 'polygon':
                 type = "Polygon";
                 text_content = $(objs[i]).find("name").text();
                 text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
-                text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
                 text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
                 isIcon = false;
                 line_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LineStyle").find("color").text());
-                line_width = $(objs[i]).find("Style").find("LineStyle").find("width").text();
+                line_width = parseInt($(objs[i]).find("Style").find("LineStyle").find("width").text());
                 plane_color = hexToRgbA(kmlColorCodeToHex($(objs[i]).find("Style").find("PolyStyle").find("color").text()));
             break;
+            case 'home':
             case 'h':
+            case 'warning':
                 type = "Point";
                 text_content = $(objs[i]).find("name").text();
                 text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
-                text_size = $(x).find("myText[id=\""+id+"\"]").attr("font");
+                text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
                 text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
                 isIcon = true;
                 icon_url = $(objs[i]).find("Style").find("IconStyle").find("Icon").find("href").text();
@@ -1266,7 +1268,7 @@ function import_kml_string(kml_str) {
                 color: plane_color,
             }),
             text: new ol.style.Text({
-                font: text_size,
+                font: text_size+" Microsoft Yahei,sans-serif",
                 fill: new ol.style.Fill({ color: text_color }),
                 stroke: new ol.style.Stroke({color: 'yellow', width: 0.8}),
                 rotation: text_rotation,
