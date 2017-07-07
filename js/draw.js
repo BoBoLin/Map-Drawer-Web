@@ -261,7 +261,7 @@ $(document).ready(function () {
             case 'font icon':
             case 'home icon':
             case 'h icon':
-            case 'warning sign icon':
+            case 'warning_sign icon':
                 var text_style = feature.getStyle().getText();
                 var text_size = parseInt(((text_style.getFont()).split('px'))[0]);
                 if (feature.getStyle().getImage().getImage().toString().indexOf("Image") != -1) {
@@ -521,7 +521,7 @@ $(document).ready(function () {
             case 'font':
             case 'home':
             case 'h':
-            case 'warning':
+            case 'warning_sign':
                 var text_style = feature.getStyle().getText();
                 var new_style = new ol.style.Style({
                     image: (($("input[name=update_point_icon]:checked").val()=="none")?
@@ -804,7 +804,7 @@ $(document).ready(function () {
                         text_content = $(objs[i]).find("name").text();
                         text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
                         text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
-                        text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                        text_rotation = parseFloat($(x).find("myText[id=\""+id+"\"]").attr("rotation"));
                         isIcon = false;
                     break;
                     case 'line':
@@ -812,7 +812,7 @@ $(document).ready(function () {
                         text_content = $(objs[i]).find("name").text();
                         text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
                         text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
-                        text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                        text_rotation = parseFloat($(x).find("myText[id=\""+id+"\"]").attr("rotation"));
                         isIcon = false;
                         line_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LineStyle").find("color").text());
                         line_width = parseInt($(objs[i]).find("Style").find("LineStyle").find("width").text());
@@ -822,7 +822,7 @@ $(document).ready(function () {
                         text_content = $(objs[i]).find("name").text();
                         text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
                         text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
-                        text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                        text_rotation = parseFloat($(x).find("myText[id=\""+id+"\"]").attr("rotation"));
                         isIcon = false;
                         line_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LineStyle").find("color").text());
                         line_width = parseInt($(objs[i]).find("Style").find("LineStyle").find("width").text());
@@ -830,12 +830,12 @@ $(document).ready(function () {
                     break;
                     case 'home':
                     case 'h':
-                    case 'warning':
+                    case 'warning_sign':
                         type = "Point";
                         text_content = $(objs[i]).find("name").text();
                         text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
                         text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
-                        text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                        text_rotation = parseFloat($(x).find("myText[id=\""+id+"\"]").attr("rotation"));
                         isIcon = true;
                         icon_url = $(objs[i]).find("Style").find("IconStyle").find("Icon").find("href").text();
                     break;
@@ -862,6 +862,7 @@ $(document).ready(function () {
                 feature.setStyle(s);
                 var draw_type = (id.split(' '))[0];
                 var $cnt = (id.split(' '))[1];
+                // add to editor
                 $("#editor > tbody").append(
                     "<tr>" +
                         "<td>" +
@@ -869,7 +870,7 @@ $(document).ready(function () {
                             "<div style='display: none;'>" + (draw_type + " " + $cnt) + "</div>" +
                         "</td>" +
                         "<td>" +
-                            "<i class='" + ((draw_type=="line")? "arrow left" : (draw_type=="polygon")? "square outline" : draw_type) + " icon'></i>" +
+                            "<i class='" + ((draw_type=="line")? "arrow left" : (draw_type=="polygon")? "square outline" : (draw_type=="warning_sign")? "warning sign" : draw_type) + " icon'></i>" +
                             "(" + text_content + ")" +
                         "</td>" +
                         "<td>" +
@@ -1026,7 +1027,7 @@ function drawIconText(/*content,color,size,rotation*/){
         switch(icon_url){
             case 'img/marker01.png': draw_type = "home";        break;
             case 'img/marker02.png': draw_type = "h";           break;
-            case 'img/marker03.png': draw_type = "warning sign";    break;
+            case 'img/marker03.png': draw_type = "warning_sign";    break;
         }
     }
     runBrush(draw_type);
@@ -1139,7 +1140,7 @@ function runBrush(draw_type) {
                     "<div style='display: none;'>" + (draw_type + " " + $cnt) + "</div>" +
                 "</td>" +
                 "<td>" +
-                    "<i class='" + ((draw_type=="line")? "arrow left" : (draw_type=="polygon")? "square outline" : draw_type) + " icon'></i>" +
+                    "<i class='" + ((draw_type=="line")? "arrow left" : (draw_type=="polygon")? "square outline" : (draw_type=="warning_sign")? "warning sign" : draw_type) + " icon'></i>" +
                     "(" + text_content + ")" +
                 "</td>" +
                 "<td>" +
@@ -1221,7 +1222,7 @@ function import_kml_string(kml_str) {
                 text_content = $(objs[i]).find("name").text();
                 text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
                 text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
-                text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                text_rotation = parseFloat($(x).find("myText[id=\""+id+"\"]").attr("rotation"));
                 isIcon = false;
             break;
             case 'line':
@@ -1229,7 +1230,7 @@ function import_kml_string(kml_str) {
                 text_content = $(objs[i]).find("name").text();
                 text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
                 text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
-                text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                text_rotation = parseFloat($(x).find("myText[id=\""+id+"\"]").attr("rotation"));
                 isIcon = false;
                 line_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LineStyle").find("color").text());
                 line_width = parseInt($(objs[i]).find("Style").find("LineStyle").find("width").text());
@@ -1239,7 +1240,7 @@ function import_kml_string(kml_str) {
                 text_content = $(objs[i]).find("name").text();
                 text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
                 text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
-                text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                text_rotation = parseFloat($(x).find("myText[id=\""+id+"\"]").attr("rotation"));
                 isIcon = false;
                 line_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LineStyle").find("color").text());
                 line_width = parseInt($(objs[i]).find("Style").find("LineStyle").find("width").text());
@@ -1247,12 +1248,12 @@ function import_kml_string(kml_str) {
             break;
             case 'home':
             case 'h':
-            case 'warning':
+            case 'warning_sign':
                 type = "Point";
                 text_content = $(objs[i]).find("name").text();
                 text_color = kmlColorCodeToHex($(objs[i]).find("Style").find("LabelStyle").find("color").text());
                 text_size = $(x).find("myText[id=\""+id+"\"]").attr("size");
-                text_rotation = $(x).find("myText[id=\""+id+"\"]").attr("rotation");
+                text_rotation = parseFloat($(x).find("myText[id=\""+id+"\"]").attr("rotation"));
                 isIcon = true;
                 icon_url = $(objs[i]).find("Style").find("IconStyle").find("Icon").find("href").text();
             break;
@@ -1280,6 +1281,7 @@ function import_kml_string(kml_str) {
         feature.setStyle(s);
         var draw_type = (id.split(' '))[0];
         var $cnt = (id.split(' '))[1];
+        // add to editor
         $("#editor > tbody").append(
             "<tr>" +
                 "<td>" +
@@ -1287,7 +1289,7 @@ function import_kml_string(kml_str) {
                     "<div style='display: none;'>" + (draw_type + " " + $cnt) + "</div>" +
                 "</td>" +
                 "<td>" +
-                    "<i class='" + ((draw_type=="line")? "arrow left" : (draw_type=="polygon")? "square outline" : draw_type) + " icon'></i>" +
+                    "<i class='" + ((draw_type=="line")? "arrow left" : (draw_type=="polygon")? "square outline" : (draw_type=="warning_sign")? "warning sign" : draw_type) + " icon'></i>" +
                     "(" + text_content + ")" +
                 "</td>" +
                 "<td>" +
