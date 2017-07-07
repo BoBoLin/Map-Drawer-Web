@@ -588,7 +588,7 @@ $(document).ready(function () {
                         width: parseInt($('#update_border_size').val()),
                     }),
                     fill: new ol.style.Fill({
-                        color: (($('#update_poly_color_picker').val()=="")? poly_color : $('#update_poly_color_picker').val()),
+                        color: (($('#update_poly_color_picker').val()=="")? hexToRgbA(poly_color) : hexToRgbA($('#update_poly_color_picker').val())),
                     }),
                     text: new ol.style.Text({
                         font: $('#update_text_size').val()+" Microsoft Yahei,sans-serif",
