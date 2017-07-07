@@ -526,8 +526,8 @@ $(document).ready(function () {
                 var new_style = new ol.style.Style({
                     image: (($("input[name=update_point_icon]:checked").val()=="none")?
                                 new ol.style.Circle({
-                                    radius: point_radius,
-                                    fill: new ol.style.Fill({ color: point_color,})
+                                    radius: 0,
+                                    fill: new ol.style.Fill({ color: "rgba(0,0,0,0)",})
                                 }) :
                                 new ol.style.Icon({
                                     anchor: [0.5, 46],
@@ -537,11 +537,11 @@ $(document).ready(function () {
                                     src: $("input[name=update_point_icon]:checked").val(),
                                 })),
                     stroke: new ol.style.Stroke({
-                        color: "",
-                        width: "",
+                        color: "rgba(0,0,0,0)",
+                        width: 0,
                     }),
                     fill: new ol.style.Fill({
-                        color: "",
+                        color: "rgba(0,0,0,0)",
                     }),
                     text: new ol.style.Text({
                         font: $('#update_text_size').val()+" Microsoft Yahei,sans-serif",
@@ -558,13 +558,16 @@ $(document).ready(function () {
                 var text_style = feature.getStyle().getText();
                 var line_style = feature.getStyle().getStroke();
                 var new_style = new ol.style.Style({
-                    image: "",
+                    image: new ol.style.Circle({
+                                radius: 0,
+                                fill: new ol.style.Fill({ color: "rgba(0,0,0,0)",})
+                            }) ,
                     stroke: new ol.style.Stroke({
                         color: (($('#update_line_color_picker').val()=="")? line_style.getColor() : $('#update_line_color_picker').val()),
                         width: parseInt($('#update_line_size').val()),
                     }),
                     fill: new ol.style.Fill({
-                        color: "",
+                        color: "rgba(0,0,0,0)",
                     }),
                     text: new ol.style.Text({
                         font: $('#update_text_size').val()+" Microsoft Yahei,sans-serif",
@@ -582,7 +585,10 @@ $(document).ready(function () {
                 var line_style = feature.getStyle().getStroke();
                 var poly_color = feature.getStyle().getFill().getColor();
                 var new_style = new ol.style.Style({
-                    image: "",
+                    image: new ol.style.Circle({
+                                radius: 0,
+                                fill: new ol.style.Fill({ color: "rgba(0,0,0,0)",})
+                            }),
                     stroke: new ol.style.Stroke({
                         color: (($('#update_border_color_picker').val()=="")? line_style.getColor() : $('#update_border_color_picker').val()),
                         width: parseInt($('#update_border_size').val()),
@@ -604,6 +610,15 @@ $(document).ready(function () {
         }
 
         closer.onclick();
+
+        // update edit icon
+        if((feature_id.split(' '))[0] == "font"){
+            if( $("input[name=update_point_icon]:checked").val() != "none"){
+                for(i=0 ; i<$("#editor > tbody > tr > td:first-child > div").length ; i++)
+                    if($($("#editor > tbody > tr > td:first-child > div")[i]).text() == feature_id)
+                        $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().children("i").attr('class', $("input[name=update_point_icon]:checked").val());
+            }
+        }
     });
     /*************** !update feature *************/
 
