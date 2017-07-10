@@ -7,6 +7,9 @@ var modify;
 
 $(document).ready(function () {
     /********* auto import ***********/
+    /*
+    當分享完後得到的url, parse出id向database拿到此id的kml資訊
+    */
     var href = location.href;
     var split_href;
     var kml_id;
@@ -24,7 +27,7 @@ $(document).ready(function () {
             jsonpCallback: 'handler',
             success: function(response) {
                 console.log(response);
-                if(response.kml == null)
+                if(response.kml == null)  //如果id不在資料庫中, reload map首頁
                 {
                     alert("The information hasn't saved.");
                     //reload main web
@@ -666,7 +669,7 @@ $(document).ready(function () {
 
     window.fbAsyncInit = function() {
         FB.init({
-            appId      : '320240928434373',
+            appId      : '320240928434373', //appId是先註冊好的
             cookie     : true,
             xfbml      : true,
             version    : 'v2.8'
@@ -683,12 +686,14 @@ $(document).ready(function () {
     }(document, 'script', 'facebook-jssdk'));
     //---!facebook init----
 
+    //點選fb share
     document.getElementById('fb_share').onclick = function() {
+        //將id 使用時間+亂數組成
         dt = new Date();
         time = dt.getFullYear() +""+(dt.getMonth()+1) +""+ dt.getDate() +""+dt.getHours() +""+ dt.getMinutes() +""+ dt.getSeconds();
         rand = Math.floor((Math.random() * 100000) + 1);
 
-         var vectorSource = featureOverlay.getSource();
+        var vectorSource = featureOverlay.getSource();
         var features = [];
         /*****************handle text export*******************/
         var myTexts = "";
@@ -714,8 +719,8 @@ $(document).ready(function () {
             method: 'share',
             href: url ,
         }, function(response){});
-        //console.log(kml_s);
 
+        //將kml與id資訊建檔於database
         var formData = {kml_str: kml_s, type: "insert", date_str: time+ ""+ rand}
         $.ajax({
             url: "http://140.116.245.84/geo/Drawer/db_connect.php",
@@ -733,12 +738,13 @@ $(document).ready(function () {
         });
     };
 
+    //點選email share
     $('#emailLink').on('click', function (event) {
         dt = new Date();
         time = dt.getFullYear() +""+(dt.getMonth()+1) +""+ dt.getDate() +""+dt.getHours() +""+ dt.getMinutes() +""+ dt.getSeconds();
         rand = Math.floor((Math.random() * 100000) + 1);
 
-         var vectorSource = featureOverlay.getSource();
+        var vectorSource = featureOverlay.getSource();
         var features = [];
         /*****************handle text export*******************/
         var myTexts = "";
@@ -766,13 +772,8 @@ $(document).ready(function () {
         window.location = 'mailto:' + email + '?subject=' + subject + '&body=' + emailBody;
 
         var formData = {kml_str: kml_s, type: "insert", date_str: time+ ""+ rand}
-        /*
-        $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string_mytext + "&type=insert" + "&date_str=" + time+ ""+ rand, dataType: 'jsonp', jsonpCallback: 'handler',
-            success: function(response) {
-                console.log(response);
-            }
-        });
-        */
+
+        //將kml與id資訊建檔於database
         $.ajax({
             url: "http://140.116.245.84/geo/Drawer/db_connect.php",
             type: "POST",
@@ -787,7 +788,6 @@ $(document).ready(function () {
                 console.log(textStatus, errorThrown);
             }
         });
-
 
     });
     /*************** !share **************/
