@@ -881,7 +881,7 @@ $(document).ready(function () {
                 $("#editor > tbody").append(
                     "<tr>" +
                         "<td>" +
-                            "<h2 class='ui center aligned header'>" + $cnt + "</h2>" +
+                            "<h2 class='ui center aligned header'>" + i + "</h2>" +
                             "<div style='display: none;'>" + (draw_type + " " + $cnt) + "</div>" +
                         "</td>" +
                         "<td>" +
@@ -1300,7 +1300,7 @@ function import_kml_string(kml_str) {
         $("#editor > tbody").append(
             "<tr>" +
                 "<td>" +
-                    "<h2 class='ui center aligned header'>" + $cnt + "</h2>" +
+                    "<h2 class='ui center aligned header'>" + i + "</h2>" +
                     "<div style='display: none;'>" + (draw_type + " " + $cnt) + "</div>" +
                 "</td>" +
                 "<td>" +
