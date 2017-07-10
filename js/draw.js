@@ -650,13 +650,8 @@ $(document).ready(function () {
 
         var base64 = btoa(unescape(encodeURIComponent(output)));
         /*****************************************************/
-        /*
-        $.ajax({url: "http://140.116.245.84/geo/Drawer/db_connect.php?kml_str=" + string + "&type=insert", dataType: 'jsonp', jsonpCallback: 'handler',
-            success: function(response) {
-                console.log(response);
-            }
-        });*/
-      exportKMLElement.href = 'data:application/vnd.google-earth.kml+xml;base64,' + base64;
+
+        exportKMLElement.href = 'data:application/vnd.google-earth.kml+xml;base64,' + base64;
     }, false);
 
     /*************** !export KML **************/
