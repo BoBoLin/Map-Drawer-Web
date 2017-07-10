@@ -802,6 +802,7 @@ $(document).ready(function () {
     });
 });
 
+// transfer kml color code "abgr" to normal hex color code "#rgb"
 function kmlColorCodeToHex(code){
     var r = code[6]+code[7];
     var g = code[4]+code[5];
@@ -840,6 +841,7 @@ var measureTooltipElement;
 */
 var sketch;
 
+// set default features to prevent some error
 function setDefaultFeatures(){
     type = "Point";
     point_color = "rgba(0, 0, 0, 0)";
@@ -1003,6 +1005,7 @@ function createMeasureTooltip() {
 }
 
 var $cnt = 0;
+// draw the shape on the map and append it to editor to make it editable
 function runBrush(draw_type) {
     draw = new ol.interaction.Draw({
         features: features,
@@ -1080,6 +1083,7 @@ function runBrush(draw_type) {
 
 }
 
+// to choose if the point is a circle or a image
 function getImage(){
     var image;
     if(isIcon){
