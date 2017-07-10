@@ -787,7 +787,6 @@ $(document).ready(function () {
     });
     /*************** !share **************/
 
-
     /*************** import KML *************/
     $("#import-kml").change(function(){
         var uploader_dom = document.getElementById('import-kml');
