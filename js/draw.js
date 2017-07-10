@@ -796,18 +796,16 @@ $(document).ready(function () {
     /*************** import KML *************/
     $("#import-kml").change(function(){
         var uploader_dom = document.getElementById('import-kml');
-
-        console.log(uploader_dom.files[0].size + " bytes");
-        console.log(uploader_dom.files[0].type);
-
         var kml_str = "";
         var reader = new FileReader();
         reader.onload = function (event) {
             // read feature to layer
             kml_str = event.target.result;
+            // add geometry feature to the map 
             var format = new ol.format.KML();
             featureOverlay.getSource().addFeatures(format.readFeatures(kml_str));
             featureOverlay.setMap(map);
+            // use jQuery parse xml format file
             var x = $.parseXML(kml_str);
             var objs = $(x).find("Placemark");
             for(var i=0;i<objs.size();i++){
@@ -910,6 +908,7 @@ $(document).ready(function () {
     });
 });
 
+// transfer kml color code "abgr" to normal hex color code "#rgb"
 function kmlColorCodeToHex(code){
     var r = code[6]+code[7];
     var g = code[4]+code[5];
@@ -948,6 +947,7 @@ var measureTooltipElement;
 */
 var sketch;
 
+// set default features to prevent some error
 function setDefaultFeatures(){
     type = "Point";
     point_color = "rgba(0, 0, 0, 0)";
@@ -1111,6 +1111,7 @@ function createMeasureTooltip() {
 }
 
 var $cnt = 0;
+// draw the shape on the map and append it to editor to make it editable
 function runBrush(draw_type) {
     draw = new ol.interaction.Draw({
         features: features,
@@ -1189,6 +1190,7 @@ function runBrush(draw_type) {
 
 }
 
+// to choose if the point is a circle or a image
 function getImage(){
     var image;
     if(isIcon){
