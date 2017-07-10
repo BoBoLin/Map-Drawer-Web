@@ -264,7 +264,7 @@ $(document).ready(function () {
             case 'font icon':
             case 'home icon':
             case 'h icon':
-            case 'warning_sign icon':
+            case 'warning sign icon':
                 var text_style = feature.getStyle().getText();
                 var text_size = parseInt(((text_style.getFont()).split('px'))[0]);
                 if (feature.getStyle().getImage().getImage().toString().indexOf("Image") != -1) {
@@ -562,9 +562,9 @@ $(document).ready(function () {
                 var line_style = feature.getStyle().getStroke();
                 var new_style = new ol.style.Style({
                     image: new ol.style.Circle({
-                                radius: 0,
-                                fill: new ol.style.Fill({ color: "rgba(0,0,0,0)",})
-                            }) ,
+                        radius: 0,
+                        fill: new ol.style.Fill({ color: "rgba(0,0,0,0)",})
+                    }) ,
                     stroke: new ol.style.Stroke({
                         color: (($('#update_line_color_picker').val()=="")? line_style.getColor() : $('#update_line_color_picker').val()),
                         width: parseInt($('#update_line_size').val()),
@@ -589,9 +589,9 @@ $(document).ready(function () {
                 var poly_color = feature.getStyle().getFill().getColor();
                 var new_style = new ol.style.Style({
                     image: new ol.style.Circle({
-                                radius: 0,
-                                fill: new ol.style.Fill({ color: "rgba(0,0,0,0)",})
-                            }),
+                        radius: 0,
+                        fill: new ol.style.Fill({ color: "rgba(0,0,0,0)",})
+                    }),
                     stroke: new ol.style.Stroke({
                         color: (($('#update_border_color_picker').val()=="")? line_style.getColor() : $('#update_border_color_picker').val()),
                         width: parseInt($('#update_border_size').val()),

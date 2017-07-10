@@ -78,7 +78,7 @@ table > tbody > tr > td > .icon.button{
 }
 
 .ol-popup-closer:after {
-    content: "✖";
+    content: "x";
 }
 /************ !popup ***********/
 
