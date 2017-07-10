@@ -612,16 +612,35 @@ $(document).ready(function () {
                 break;
         }
 
-        closer.onclick();
-
         // update edit icon
-        if((feature_id.split(' '))[0] == "font"){
-            if( $("input[name=update_point_icon]:checked").val() != "none"){
-                for(i=0 ; i<$("#editor > tbody > tr > td:first-child > div").length ; i++)
-                    if($($("#editor > tbody > tr > td:first-child > div")[i]).text() == feature_id)
-                        $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().children("i").attr('class', $("input[name=update_point_icon]:checked").val());
-            }
+        if((feature_id.split(' '))[0] == "font" || (feature_id.split(' '))[0] == "home" || (feature_id.split(' '))[0] == "h" || (feature_id.split(' '))[0] == "warning_sign"){
+            for(i=0 ; i<$("#editor > tbody > tr > td:first-child > div").length ; i++)
+                if($($("#editor > tbody > tr > td:first-child > div")[i]).text() == feature_id)
+                    switch($("input[name=update_point_icon]:checked").val()){
+                        case 'none':
+                            $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='font icon'></i>(" + $('#update_text_content').val() + ")");
+                            $($("#editor > tbody > tr > td:first-child > div")[i]).text("font " + (feature_id.split(' '))[1]);
+                            feature.setId("font " + (feature_id.split(' '))[1]);
+                            break;
+                        case 'img/marker01.png':
+                            $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='home icon'></i>(" + $('#update_text_content').val() + ")");
+                            $($("#editor > tbody > tr > td:first-child > div")[i]).text("home " + (feature_id.split(' '))[1]);
+                            feature.setId("home " + (feature_id.split(' '))[1]);
+                            break;
+                        case 'img/marker02.png':
+                            $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='h icon'></i>(" + $('#update_text_content').val() + ")");
+                            $($("#editor > tbody > tr > td:first-child > div")[i]).text("h " + (feature_id.split(' '))[1]);
+                            feature.setId("h " + (feature_id.split(' '))[1]);
+                            break;
+                        case 'img/marker03.png':
+                            $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='warning sign icon'></i>(" + $('#update_text_content').val() + ")");
+                            $($("#editor > tbody > tr > td:first-child > div")[i]).text("warning_sign " + (feature_id.split(' '))[1]);
+                            feature.setId("warning_sign " + (feature_id.split(' '))[1]);
+                            break;
+                    }
         }
+
+        closer.onclick();
     });
     /*************** !update feature *************/
 
