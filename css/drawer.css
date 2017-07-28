@@ -1,7 +1,14 @@
+.button{
+    position: relative;
+    bottom: auto;
+    left: auto;
+}
+
 #show_hide_draw_menu{
     position: absolute;
     top: 15px;
     left: 15px;
+    bottom: auto;
 }
 
 .ui.styled.accordion{
