@@ -1,6 +1,12 @@
-.ui.styled.accordion{
+#show_hide_draw_menu{
     position: absolute;
     top: 15px;
+    left: 15px;
+}
+
+.ui.styled.accordion{
+    position: absolute;
+    top: 60px;
     left: 15px;
     width: 400px;
 }
