@@ -8,6 +8,10 @@ var modify;
 $(document).ready(function () {
 
     /********* component init ***********/
+    $('#show_hide_draw_menu').click(function () {
+        $('.ui.accordion').toggle();
+    });
+
     $('.ui.accordion').accordion({
         onOpen: function () {
             if ($(this).index(".content") == 0) {
