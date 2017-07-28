@@ -1,0 +1,231 @@
+﻿input,button,select,textarea{outline:none}
+ *:focus { outline: none; }
+ 
+html, body,#map-canvas,fullScreenTarget {
+    width: 100vw;
+    height:100vh;
+	margin: 0px;
+	padding: 0px;
+    z-index:0;
+	list-style:none;
+
+}
+/*-webkit-overflow-scrolling: touch;*/
+
+#menu_down select,#Cursor_Coord
+{
+	position:absolute;
+	border-radius:4px;
+	border:1px solid #FFF;
+	background:rgba(0,60,136,.7);
+	text-align:center;	
+	font-size:1.3em;
+	font-family:microsoft jhenghei ;
+	color:white;	
+	z-index:100;
+    line-height:1.6rem;
+    height:1.6rem;
+}
+
+#menu_down option { background:#777;
+}
+/*標籤*/
+
+
+#menu {   
+	top:.5em;
+	left:.5em; 
+}
+
+#FullScreen{
+	top:.5em;
+	right:.5em;
+}
+#FullExstent{
+	top:4em;
+	right:.5em;	
+}
+#Attributes {
+	top:7.5em;
+	right:.5em;
+}
+#Legend{
+	top:11em;
+	right:.5em;	
+}
+#Locate{
+	display:none;
+	top:14.5em;
+	right:.5em;	
+}	
+
+
+
+.Info{
+	position:absolute;
+	display:none;	
+	z-index:1000;
+	background:white;
+}
+
+
+/*表單內容*/
+
+      .button {
+          position: absolute;
+          bottom: 40px;
+          left: 10px;
+      }
+	  
+.jquery-accordion-menu
+{
+	position:absolute;
+	/*box-shadow: 4px 0px 10px 2px #222;*/
+    padding-top:0px;	
+	left:0px;
+	width:260px;	
+	position:fixed;
+	z-index:9999;
+}
+
+::-webkit-scrollbar {
+      width: 5px;
+}
+::-webkit-scrollbar-track {
+      background-color: white;
+}
+::-webkit-scrollbar-thumb {
+      background-color: #bbb
+}
+::-webkit-scrollbar-button {
+     display:none;
+}
+::-webkit-scrollbar-corner {
+      background-color: black;
+}	
+
+* {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+html {
+	-ms-touch-action: none;
+}
+
+body,ul,li {
+	padding: 0;
+	margin: 0;
+}
+
+body {
+	font-size: 12px;
+	font-family: microsoft JhengHei;
+	overflow: hidden; /* this is important to prevent the whole page to bounce */
+}
+
+#header {
+	position: absolute;
+	z-index: 2;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 45px;
+	line-height: 45px;
+	background: #CD235C;
+	padding: 0;
+	color: #eee;
+	font-size: 20px;
+	text-align: center;
+	font-weight: bold;
+}
+
+#footer {
+	position: absolute;
+	z-index: 2;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 48px;
+	background: #444;
+	padding: 0;
+	border-top: 1px solid #444;
+}
+
+#wrapper {
+	position: absolute;
+	z-index: 1;
+	top: 0px;
+	bottom: 0px;
+	left: 0;
+	width: 100%;
+	background: transparent;
+	overflow: hidden;
+}
+
+#scroller {
+	position: absolute;
+	z-index: 1;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	width: 100%;
+	-webkit-transform: translateZ(0);
+	-moz-transform: translateZ(0);
+	-ms-transform: translateZ(0);
+	-o-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-text-size-adjust: none;
+	-moz-text-size-adjust: none;
+	-ms-text-size-adjust: none;
+	-o-text-size-adjust: none;
+	text-size-adjust: none;
+}
+
+
+#geolocation_marker
+{
+	position: absolute;
+	top:50%;
+	left:50%;
+	z-index:50;
+}
+
+
+
+ .tooltip {
+        position: relative;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 4px;
+        color: white;
+        padding: 4px 8px;
+        opacity: 0.7;
+        white-space: nowrap;
+      }
+      .tooltip-measure {
+        opacity: 1;
+        font-weight: bold;
+      }
+      .tooltip-static {
+        background-color: #ffcc33;
+        color: black;
+        border: 1px solid white;
+      }
+      .tooltip-measure:before,
+      .tooltip-static:before {
+        border-top: 6px solid rgba(0, 0, 0, 0.5);
+        border-right: 6px solid transparent;
+        border-left: 6px solid transparent;
+        content: "";
+        position: absolute;
+        bottom: -6px;
+        margin-left: -7px;
+        left: 50%;
+      }
+      .tooltip-static:before {
+        border-top-color: #ffcc33;
+      }   
