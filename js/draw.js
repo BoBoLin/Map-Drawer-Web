@@ -156,8 +156,9 @@ $(document).ready(function () {
         })
     });
 
+    var want_modify_feature = new ol.Collection();
     modify = new ol.interaction.Modify({
-        features: features,
+        features: want_modify_feature,
         // the SHIFT key must be pressed to delete vertices, so
         // that new vertices can be drawn at the same position
         // of existing vertices
@@ -220,6 +221,8 @@ $(document).ready(function () {
         }
         coord[1] += 7000;
         popup_overlay.setPosition(coord);
+
+        want_modify_feature.push(feature);
 
         var type = $(this).parent().siblings("td:nth-child(2)").children("i").attr('class');
         switch(type){
@@ -480,6 +483,7 @@ $(document).ready(function () {
     $('#update').click(function () {
         var feature_id = $(this).siblings("#popup-content").children("div").first().text();
         var feature = featureOverlay.getSource().getFeatureById(feature_id);
+        want_modify_feature.remove(feature);
         console.log((feature_id.split(' '))[0]);
 
         switch((feature_id.split(' '))[0]){
