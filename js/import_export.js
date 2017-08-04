@@ -101,6 +101,29 @@ function import_kml_string(kml_str) {
     featureOverlay.setMap(map);
     var x = $.parseXML(kml_str);
     var objs = $(x).find("Placemark");
+    /*
+    var name = $(objs[0]).find("name").text();
+    var isPoint = $(objs[0]).find("Point").length;
+    var isLineString = $(objs[0]).find("LineString").length;
+    var isPolygon = $(objs[0]).find("Polygon").length;
+    var coordiante;
+    if(isPoint){
+        type = "Point";
+        coordiante = $(objs[0]).find("Point")
+    }
+    else if(isLineString){
+        type = "LineString";
+    }
+    else if(isPolygon){
+        type = "Polygon";
+    }
+    else{
+        type = "no type";
+    }
+
+    out = type;
+    console.log(out);
+    */
     for(var i=0;i<objs.size();i++){
         var id = $(objs[i]).attr("id");
         setDefaultFeatures();

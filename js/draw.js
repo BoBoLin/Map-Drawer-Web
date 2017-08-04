@@ -145,13 +145,13 @@ $(document).ready(function () {
     featureOverlay = new ol.layer.Vector({
         source: new ol.source.Vector({features: features}),
     });
-
     map = new ol.Map({
         layers: [raster, featureOverlay],
         overlays: [popup_overlay],
         target: 'map',
         view: new ol.View({
-            center: ol.proj.transform([120.594013,23.267667], 'EPSG:4326', 'EPSG:3857'),
+            projection: 'EPSG:4326',
+            center: [120.594013,23.267667],
             zoom: 8
         })
     });
