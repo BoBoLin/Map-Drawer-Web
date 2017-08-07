@@ -12,7 +12,8 @@
         <link rel="stylesheet" type="text/css" href="css/semantic.min.css">
         <link rel="stylesheet" type="text/css" href="css/spectrum.css" >
         <link rel="stylesheet" type="text/css" href="css/range.css" >
-        <link rel="stylesheet" type="text/css" href="css/drawer.css" >
+        <link rel="stylesheet" type="text/css" href="css/drawer.css">
+        <link rel="stylesheet" type="text/css" href="css/measure.css">
 
         <script type="text/javascript" src="js/jquery-1.12.1.min.js"></script>
         <script type="text/javascript" src="js/ol.js"></script>
@@ -23,7 +24,7 @@
         <script type="text/javascript" src="js/draw.js"></script>
         <script type="text/javascript" src="js/import_export.js"></script>
         <script type="text/javascript" src="js/share.js"></script>
-
+        
     </head>
     <body>
 
@@ -54,6 +55,8 @@
                             <a class="item" data-tab="three"><img src="img/paint04.png" alt=""></a>
                             <!-- arrow -->
                             <a class="item" data-tab="four"><img src="img/paint03.png" alt=""></a>
+                            <!-- measure -->
+                            <a class="item" data-tab="five"><img src="img/paint05.png" alt=""></a>
                         </div>
                         <div class="ui tab segment" data-tab="one" id="move_map_button"></div>
                         <!-- point -->
@@ -193,6 +196,26 @@
                                     </div>
                                 </div>
                                 <button class="ui button" id="poly_button">套用</button>
+                            </div>
+                        </div>
+                        <div class="ui tab segment" data-tab="five">
+                            <div class="ui form" id="poly_menu">
+                                <div class="field">
+                                    <label>測量型態</label>
+                                    <select id="type">
+                                        <option value="length">線段長度 (LineString)</option>
+                                        <option value="area">多邊形面積 (Polygon)</option>
+                                    </select>
+                                </div>
+                                <div class="fields">
+                                    <div class="eight wide field">
+                                        <button class="ui button" id="measure_button">套用</button>
+                                    </div>
+                                    <div class="field">
+                                        <button class="ui button" id="measure_clean">清除測量</button>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>

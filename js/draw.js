@@ -4,8 +4,41 @@ var featureOverlay;
 var popup_overlay;
 var features;
 var modify;
+var typeSelect
+
+var measure;
+/**
+* Currently drawn feature.
+* @type {ol.Feature}
+*/
+var sketch;
+/**
+* The help tooltip element.
+* @type {Element}
+*/
+var helpTooltipElement;
+/**
+* Overlay to show the help messages.
+* @type {ol.Overlay}
+*/
+var helpTooltip;
+/**
+* The measure tooltip element.
+* @type {Element}
+*/
+var measureTooltipElement;
+
+/**
+* Overlay to show the measurement.
+* @type {ol.Overlay}
+*/
+var measureTooltip;
+var wgs84Sphere = new ol.Sphere(6378137);
+var measure_draw;
+var source = new ol.source.Vector();
 
 $(document).ready(function () {
+    typeSelect = document.getElementById('type');
 
     /********* component init ***********/
     $('#show_hide_draw_menu').click(function () {
@@ -145,6 +178,8 @@ $(document).ready(function () {
     featureOverlay = new ol.layer.Vector({
         source: new ol.source.Vector({features: features}),
     });
+
+
     map = new ol.Map({
         layers: [raster, featureOverlay],
         overlays: [popup_overlay],
@@ -178,18 +213,28 @@ $(document).ready(function () {
 
     $('#point_button').click(function () {
         map.removeInteraction(draw); // remove old brush
+        map.removeInteraction(measure_draw);
+        clear_helptooltip();
         drawIconText();
     });
 
     $('#line_button').click(function () {
         map.removeInteraction(draw); // remove old brush
+        map.removeInteraction(measure_draw);
+        clear_helptooltip();
         drawLine();
     });
 
     $('#poly_button').click(function () {
         map.removeInteraction(draw); // remove old brush
+        map.removeInteraction(measure_draw);
+        clear_helptooltip();
         drawPolygon();
     });
+
+    $('#measure_button').click(function(){
+        measure_start();
+    })
 
     $(document).on('click', '.search.button', function () {
         var feature_id = $(this).parent().siblings("td").first().children("div").text();
@@ -610,7 +655,100 @@ $(document).ready(function () {
     });
     /*************** !update feature *************/
 
+    /*************** measure *************/
+    /**
+    * Let user change the geometry type.
+    */
+    //typeSelect.onchange = function() {
+      //  map.removeInteraction(measure_draw);
+        //addInteraction();
+    //};    
+
+    function measure_start(){
+
+        map.removeInteraction(draw);
+        map.removeInteraction(measure_draw);
+
+        measure = new ol.layer.Vector({
+            source: source,
+            style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 255, 255, 0)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#ffcc33',
+                    width: 2
+                }),
+                image: new ol.style.Circle({
+                    radius: 7,
+                    fill: new ol.style.Fill({
+                        color: '#ffcc33'
+                    })
+                })
+            })
+        });
+        
+      /**
+      * Message to show when the user is drawing a polygon.
+      * @type {string}
+      */
+      var continuePolygonMsg = 'Click to continue drawing the polygon';
+
+      /**
+      * Message to show when the user is drawing a line.
+      * @type {string}
+      */
+      var continueLineMsg = 'Click to continue drawing the line';
+
+      /**
+      * Handle pointer move.
+      * @param {ol.MapBrowserEvent} evt The event.
+      */
+      createMeasureTooltip();
+      createHelpTooltip();
+
+      var pointerMoveHandler = function(evt) {
+        if (evt.dragging) {
+          return;
+        }
+        /** @type {string} */
+        var helpMsg = 'Click to start drawing';
+
+        if (sketch) {
+          var geom = (sketch.getGeometry());
+          if (geom instanceof ol.geom.Polygon) {
+            helpMsg = continuePolygonMsg;
+          } else if (geom instanceof ol.geom.LineString) {
+            helpMsg = continueLineMsg;
+          }
+        }
+
+        helpTooltipElement.innerHTML = helpMsg;
+        helpTooltip.setPosition(evt.coordinate);
+
+        helpTooltipElement.classList.remove('hidden');
+      };
+
+      map.on('pointermove', pointerMoveHandler);
+
+      map.getViewport().addEventListener('mouseout', function() {
+        helpTooltipElement.classList.add('hidden');
+      });
+
+      map.addLayer(measure);
+      addInteraction();
+    };
+    //addInteraction();
+
+    // 清除measure圖層與tooltip
+    $('#measure_clean').click(function () {
+        measure_clean();
+    });
+
+    /*************** !measure *************/
+
 });
+
 
 // transfer kml color code "abgr" to normal hex color code "#rgb"
 function kmlColorCodeToHex(code){
@@ -667,13 +805,15 @@ function setDefaultFeatures(){
     isIcon = false;
 }
 
-
-
-
 function map_move_mode(){
+    //關掉畫圖與測量
     map.removeInteraction(draw);
-    interaction = new ol.interaction.Select();
-    map.addInteraction(interaction);
+    map.removeInteraction(measure_draw);
+
+    clear_helptooltip();
+    
+    //interaction = new ol.interaction.Select();
+    //map.addInteraction(interaction);
 }
 
 /*
@@ -798,21 +938,26 @@ var formatLength = function(line) {
 };
 
 /**
-* Creates a new measure tooltip
+* Format area output.
+* @param {ol.geom.Polygon} polygon The polygon.
+* @return {string} Formatted area.
 */
-function createMeasureTooltip() {
-    if (measureTooltipElement) {
-        measureTooltipElement.parentNode.removeChild(measureTooltipElement);
+var formatArea = function(polygon) {
+    var area;
+
+    var sourceProj = map.getView().getProjection();
+    var geom = /** @type {ol.geom.Polygon} */(polygon.clone().transform(sourceProj, 'EPSG:4326'));
+    var coordinates = geom.getLinearRing(0).getCoordinates();
+    area = Math.abs(wgs84Sphere.geodesicArea(coordinates)); 
+
+    var output;
+    if (area > 10000) {
+        output = (Math.round(area / 1000000 * 100) / 100) + ' ' + 'km<sup>2</sup>';
+    }else {
+        output = (Math.round(area * 100) / 100) + ' ' + 'm<sup>2</sup>';
     }
-    measureTooltipElement = document.createElement('div');
-    measureTooltipElement.className = 'tooltip tooltip-measure';
-    measureTooltip = new ol.Overlay({
-        element: measureTooltipElement,
-        offset: [0, -15],
-        positioning: 'bottom-center'
-    });
-    map.addOverlay(measureTooltip);
-}
+    return output;
+};
 
 var $cnt = 0;
 // draw the shape on the map and append it to editor to make it editable
@@ -926,4 +1071,141 @@ function hexToRgbA(hex){
     }
     throw new Error('Bad Hex');
 }
+
+
+/*************** measure function *************/
+
+function clear_helptooltip(){
+    //helpTooltipElement關閉
+    if (helpTooltipElement) {
+        if(helpTooltipElement.parentNode)
+            helpTooltipElement.parentNode.removeChild(helpTooltipElement);
+    }
+}
+
+function addInteraction() {
+    var type = (typeSelect.value == 'area' ? 'Polygon' : 'LineString');
+    measure_draw = new ol.interaction.Draw({
+        source: source,
+        type: /** @type {ol.geom.GeometryType} */ (type),
+        style: new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: 'rgba(255, 255, 255, 0)'
+            }),
+            stroke: new ol.style.Stroke({
+                color: 'rgba(0, 0, 0, 0.5)',
+                lineDash: [10, 10],
+                width: 2
+            }),
+            image: new ol.style.Circle({
+                radius: 5,
+                stroke: new ol.style.Stroke({
+                    color: 'rgba(0, 0, 0, 0.7)'
+                }),
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 255, 255, 0.2)'
+                })
+            })
+        })
+    });
+
+    map.addInteraction(measure_draw);
+
+    createMeasureTooltip();
+    createHelpTooltip();
+
+    var listener;
+    measure_draw.on('drawstart',
+        function(evt) {
+            // set sketch
+            sketch = evt.feature;
+
+            /** @type {ol.Coordinate|undefined} */
+            var tooltipCoord = evt.coordinate;
+
+            listener = sketch.getGeometry().on('change', function(evt) {
+                var geom = evt.target;
+                var output;
+                if (geom instanceof ol.geom.Polygon) {
+                    output = formatArea(geom);
+                    tooltipCoord = geom.getInteriorPoint().getCoordinates();
+                } else if (geom instanceof ol.geom.LineString) {
+                    output = formatLength(geom);
+                    tooltipCoord = geom.getLastCoordinate();
+                }
+                measureTooltipElement.innerHTML = output;
+                measureTooltip.setPosition(tooltipCoord);
+            });
+        }, this);
+
+    measure_draw.on('drawend',
+        function() {
+            measureTooltipElement.className = 'tooltip tooltip-me';
+            measureTooltip.setOffset([0, -7]);
+            // unset sketch
+            sketch = null;
+            // unset tooltip so that a new one can be created
+            measureTooltipElement = null;
+            createMeasureTooltip();
+            ol.Observable.unByKey(listener);
+        }, this);
+}
+
+/**
+* Creates a new help tooltip
+*/
+function createHelpTooltip() {
+    if (helpTooltipElement) {
+        if(helpTooltipElement.parentNode)
+            helpTooltipElement.parentNode.removeChild(helpTooltipElement);
+
+    }
+    helpTooltipElement = document.createElement('div');
+    helpTooltipElement.className = 'tooltip hidden';
+    helpTooltip = new ol.Overlay({
+      element: helpTooltipElement,
+      offset: [15, 0],
+      positioning: 'center-left'
+    });
+    map.addOverlay(helpTooltip);
+}
+
+/**
+* Creates a new measure tooltip
+*/
+function createMeasureTooltip() {
+    if (measureTooltipElement) {
+        measureTooltipElement.parentNode.removeChild(measureTooltipElement);
+    }
+    measureTooltipElement = document.createElement('div');
+    measureTooltipElement.className = 'tooltip tooltip-measure';
+    measureTooltip = new ol.Overlay({
+        element: measureTooltipElement,
+        offset: [0, -15],
+        positioning: 'bottom-center'
+    });
+    map.addOverlay(measureTooltip);
+}
+
+// 清除measure圖層與tooltip
+function measure_clean(){
+    if (measure) {
+        map.removeLayer(measure);
+        measure.getSource().clear();
+        source.clear();
+        map.addLayer(measure);
+        var staticTooltip = document.getElementsByClassName("tooltip-me");
+        var length = staticTooltip.length;
+        for(var i = 0; i < length; i++)
+        {
+            //staticTooltip[0].parentNode.removeChild(staticTooltip[0]);
+            if (staticTooltip[0]) {
+                staticTooltip[0].parentNode.removeChild(staticTooltip[0]);
+            }
+        }
+        createMeasureTooltip();
+      }
+}
+
+/*************** !measure function *************/
 
