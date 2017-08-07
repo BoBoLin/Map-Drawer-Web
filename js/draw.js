@@ -264,7 +264,7 @@ $(document).ready(function () {
         }else{
             var coord = feature.getGeometry().getCoordinates();
         }
-        coord[1] += 7000;
+        coord[1] += 0.1;
         popup_overlay.setPosition(coord);
 
         want_modify_feature.push(feature);
@@ -662,7 +662,7 @@ $(document).ready(function () {
     //typeSelect.onchange = function() {
       //  map.removeInteraction(measure_draw);
         //addInteraction();
-    //};    
+    //};
 
     function measure_start(){
 
@@ -687,7 +687,7 @@ $(document).ready(function () {
                 })
             })
         });
-        
+
       /**
       * Message to show when the user is drawing a polygon.
       * @type {string}
@@ -811,7 +811,7 @@ function map_move_mode(){
     map.removeInteraction(measure_draw);
 
     clear_helptooltip();
-    
+
     //interaction = new ol.interaction.Select();
     //map.addInteraction(interaction);
 }
@@ -948,7 +948,7 @@ var formatArea = function(polygon) {
     var sourceProj = map.getView().getProjection();
     var geom = /** @type {ol.geom.Polygon} */(polygon.clone().transform(sourceProj, 'EPSG:4326'));
     var coordinates = geom.getLinearRing(0).getCoordinates();
-    area = Math.abs(wgs84Sphere.geodesicArea(coordinates)); 
+    area = Math.abs(wgs84Sphere.geodesicArea(coordinates));
 
     var output;
     if (area > 10000) {
