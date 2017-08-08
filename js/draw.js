@@ -160,6 +160,10 @@ $(document).ready(function () {
     * @return {boolean} Don't follow the href.
     */
     closer.onclick = function() {
+        var feature_id = $('#update').siblings("#popup-content").children("div").first().text();
+        var feature = featureOverlay.getSource().getFeatureById(feature_id);
+        want_modify_feature.remove(feature);
+
         popup_overlay.setPosition(undefined);
         content.innerHTML = "";
         closer.blur();
