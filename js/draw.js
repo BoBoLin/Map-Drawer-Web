@@ -38,7 +38,6 @@ var measure_draw;
 var source = new ol.source.Vector();
 
 $(document).ready(function () {
-    typeSelect = document.getElementById('type');
 
     /********* component init ***********/
     $('#show_hide_draw_menu').click(function () {
@@ -664,6 +663,8 @@ $(document).ready(function () {
         //addInteraction();
     //};
 
+    typeSelect = document.getElementById('type');
+
     function measure_start(){
 
         map.removeInteraction(draw);
@@ -773,21 +774,7 @@ var icon_url;
 var isIcon;
 var brush = false;
 var is_measure = false;
-/**
-* Overlay to show the measurement.
-* @type {ol.Overlay}
-*/
-var measureTooltip;
-/**
-* The measure tooltip element.
-* @type {Element}
-*/
-var measureTooltipElement;
-/**
-* Currently drawn feature.
-* @type {ol.Feature}
-*/
-var sketch;
+
 
 // set default features to prevent some error
 function setDefaultFeatures(){
@@ -913,51 +900,7 @@ function putIcon(url){
 }
 */
 
-/**
-* Format length output.
-* @param {ol.geom.LineString} line The line.
-* @return {string} The formatted length.
-*/
-var formatLength = function(line) {
-    var length;
-    var coordinates = line.getCoordinates();
-    length = 0;
-    var sourceProj = map.getView().getProjection();
-    for (var i = 0, ii = coordinates.length - 1; i < ii; ++i) {
-        var c1 = ol.proj.transform(coordinates[i], sourceProj, 'EPSG:4326');
-        var c2 = ol.proj.transform(coordinates[i + 1], sourceProj, 'EPSG:4326');
-        length += wgs84Sphere.haversineDistance(c1, c2);
-    }
-    var output;
-    if (length > 100) {
-        output = (Math.round(length / 1000 * 100) / 100) + ' km';
-    } else {
-        output = (Math.round(length * 100) / 100) + ' m';
-    }
-    return output;
-};
 
-/**
-* Format area output.
-* @param {ol.geom.Polygon} polygon The polygon.
-* @return {string} Formatted area.
-*/
-var formatArea = function(polygon) {
-    var area;
-
-    var sourceProj = map.getView().getProjection();
-    var geom = /** @type {ol.geom.Polygon} */(polygon.clone().transform(sourceProj, 'EPSG:4326'));
-    var coordinates = geom.getLinearRing(0).getCoordinates();
-    area = Math.abs(wgs84Sphere.geodesicArea(coordinates));
-
-    var output;
-    if (area > 10000) {
-        output = (Math.round(area / 1000000 * 100) / 100) + ' ' + 'km<sup>2</sup>';
-    }else {
-        output = (Math.round(area * 100) / 100) + ' ' + 'm<sup>2</sup>';
-    }
-    return output;
-};
 
 var $cnt = 0;
 // draw the shape on the map and append it to editor to make it editable
@@ -968,9 +911,7 @@ function runBrush(draw_type) {
     });
     map.addInteraction(draw);
 
-
     if(is_measure)  createMeasureTooltip();
-
 
     draw.on('drawstart',function(event){
         var s = new ol.style.Style({
@@ -1075,6 +1016,53 @@ function hexToRgbA(hex){
 
 /*************** measure function *************/
 
+/**
+* Format length output.
+* @param {ol.geom.LineString} line The line.
+* @return {string} The formatted length.
+*/
+var formatLength = function(line) {
+    var length;
+    var coordinates = line.getCoordinates();
+    length = 0;
+    var sourceProj = map.getView().getProjection();
+    for (var i = 0, ii = coordinates.length - 1; i < ii; ++i) {
+        var c1 = ol.proj.transform(coordinates[i], sourceProj, 'EPSG:4326');
+        var c2 = ol.proj.transform(coordinates[i + 1], sourceProj, 'EPSG:4326');
+        length += wgs84Sphere.haversineDistance(c1, c2);
+    }
+    var output;
+    if (length > 100) {
+        output = (Math.round(length / 1000 * 100) / 100) + ' km';
+    } else {
+        output = (Math.round(length * 100) / 100) + ' m';
+    }
+    return output;
+};
+
+/**
+* Format area output.
+* @param {ol.geom.Polygon} polygon The polygon.
+* @return {string} Formatted area.
+*/
+var formatArea = function(polygon) {
+    var area;
+
+    var sourceProj = map.getView().getProjection();
+    var geom = /** @type {ol.geom.Polygon} */(polygon.clone().transform(sourceProj, 'EPSG:4326'));
+    var coordinates = geom.getLinearRing(0).getCoordinates();
+    area = Math.abs(wgs84Sphere.geodesicArea(coordinates));
+
+    var output;
+    if (area > 10000) {
+        output = (Math.round(area / 1000000 * 100) / 100) + ' ' + 'km<sup>2</sup>';
+    }else {
+        output = (Math.round(area * 100) / 100) + ' ' + 'm<sup>2</sup>';
+    }
+    return output;
+};
+
+
 function clear_helptooltip(){
     //helpTooltipElement關閉
     if (helpTooltipElement) {
@@ -1084,7 +1072,7 @@ function clear_helptooltip(){
 }
 
 function addInteraction() {
-    var type = (typeSelect.value == 'area' ? 'Polygon' : 'LineString');
+    var type = (typeSelect.value == 'area' ? 'Polygon' : typeSelect.value == 'length' ? 'LineString' : 'Point');
     measure_draw = new ol.interaction.Draw({
         source: source,
         type: /** @type {ol.geom.GeometryType} */ (type),
@@ -1119,23 +1107,41 @@ function addInteraction() {
         function(evt) {
             // set sketch
             sketch = evt.feature;
-
             /** @type {ol.Coordinate|undefined} */
             var tooltipCoord = evt.coordinate;
+            var coord;
 
-            listener = sketch.getGeometry().on('change', function(evt) {
-                var geom = evt.target;
-                var output;
-                if (geom instanceof ol.geom.Polygon) {
-                    output = formatArea(geom);
-                    tooltipCoord = geom.getInteriorPoint().getCoordinates();
-                } else if (geom instanceof ol.geom.LineString) {
-                    output = formatLength(geom);
-                    tooltipCoord = geom.getLastCoordinate();
-                }
+            if(type == "Point")
+            {
+                //得到經緯度座標
+                coord = evt.feature.getGeometry().getCoordinates();
+                output = coord;
+
+                //顯示取到四捨五入第四位
+                var size = Math.pow(10, 4);
+                output[0] = Math.round(output[0] * size) / size ;
+                output[1] = Math.round(output[1] * size) / size ;
+
                 measureTooltipElement.innerHTML = output;
-                measureTooltip.setPosition(tooltipCoord);
-            });
+                measureTooltip.setPosition(coord);
+            }
+            else
+            {
+                listener = sketch.getGeometry().on('change', function(evt) {
+                    var geom = evt.target;
+                    var output;
+                    if (geom instanceof ol.geom.Polygon) {
+                        output = formatArea(geom);
+                        tooltipCoord = geom.getInteriorPoint().getCoordinates();
+                    } else if (geom instanceof ol.geom.LineString) {
+                        output = formatLength(geom);
+                        tooltipCoord = geom.getLastCoordinate();
+                    }
+                    measureTooltipElement.innerHTML = output;
+                    measureTooltip.setPosition(tooltipCoord);
+                });
+            }
+            
         }, this);
 
     measure_draw.on('drawend',
