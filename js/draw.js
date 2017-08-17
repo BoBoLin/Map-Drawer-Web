@@ -279,7 +279,7 @@ $(document).ready(function () {
             case 'h icon':
             case 'warning sign icon':
                 var text_style = feature.getStyle().getText();
-                var text_size = parseInt(((text_style.getFont()).split('px'))[0]);
+                var text_size = text_style.getScale();
                 if (feature.getStyle().getImage().getImage().toString().indexOf("Image") != -1) {
                     var img = feature.getStyle().getImage().getSrc();
                 }else{
@@ -293,14 +293,13 @@ $(document).ready(function () {
                             "<div class='eight wide field'>" +
                                 "<label>字體大小</label>" +
                                 "<select id='update_text_size'>" +
-                                    "<option value='8px' " + ((text_size == 8)? "selected='selected'" : "") + ">8</option>" +
-                                    "<option value='9px' " + ((text_size == 9)? "selected='selected'" : "") + ">9</option>" +
-                                    "<option value='10px' " + ((text_size == 10)? "selected='selected'" : "") + ">10</option>" +
-                                    "<option value='11px' " + ((text_size == 11)? "selected='selected'" : "") + ">11</option>" +
-                                    "<option value='12px' " + ((text_size == 12)? "selected='selected'" : "") + ">12</option>" +
-                                    "<option value='13px' " + ((text_size == 13)? "selected='selected'" : "") + ">13</option>" +
-                                    "<option value='20px' " + ((text_size == 20)? "selected='selected'" : "") + ">20</option>" +
-                                    "<option value='40px' " + ((text_size == 40)? "selected='selected'" : "") + ">40</option>" +
+                                    "<option value='1' " + ((text_size == 1)? "selected='selected'" : "") + ">1</option>" +
+                                    "<option value='1.3' " + ((text_size == 1.3)? "selected='selected'" : "") + ">1.3</option>" +
+                                    "<option value='1.7' " + ((text_size == 1.7)? "selected='selected'" : "") + ">1.7</option>" +
+                                    "<option value='2' " + ((text_size == 2)? "selected='selected'" : "") + ">2</option>" +
+                                    "<option value='2.3' " + ((text_size == 2.3)? "selected='selected'" : "") + ">2.3</option>" +
+                                    "<option value='2.7' " + ((text_size == 2.7)? "selected='selected'" : "") + ">2.7</option>" +
+                                    "<option value='3' " + ((text_size == 3)? "selected='selected'" : "") + ">3</option>" +
                                 "</select>" +
                             "</div>" +
                             "<div class='eight wide field'>" +
@@ -355,7 +354,7 @@ $(document).ready(function () {
 
             case 'arrow left icon':
                 var text_style = feature.getStyle().getText();
-                var text_size = parseInt(((text_style.getFont()).split('px'))[0]);
+                var text_size = text_style.getScale();
                 var line_style = feature.getStyle().getStroke();
                 var line_width = parseInt(line_style.getWidth());
 
@@ -366,14 +365,13 @@ $(document).ready(function () {
                             "<div class='eight wide field'>" +
                                 "<label>字體大小</label>" +
                                 "<select id='update_text_size'>" +
-                                    "<option value='8px' " + ((text_size == 8)? "selected='selected'" : "") + ">8</option>" +
-                                    "<option value='9px' " + ((text_size == 9)? "selected='selected'" : "") + ">9</option>" +
-                                    "<option value='10px' " + ((text_size == 10)? "selected='selected'" : "") + ">10</option>" +
-                                    "<option value='11px' " + ((text_size == 11)? "selected='selected'" : "") + ">11</option>" +
-                                    "<option value='12px' " + ((text_size == 12)? "selected='selected'" : "") + ">12</option>" +
-                                    "<option value='13px' " + ((text_size == 13)? "selected='selected'" : "") + ">13</option>" +
-                                    "<option value='20px' " + ((text_size == 20)? "selected='selected'" : "") + ">20</option>" +
-                                    "<option value='40px' " + ((text_size == 40)? "selected='selected'" : "") + ">40</option>" +
+                                    "<option value='1' " + ((text_size == 1)? "selected='selected'" : "") + ">1</option>" +
+                                    "<option value='1.3' " + ((text_size == 1.3)? "selected='selected'" : "") + ">1.3</option>" +
+                                    "<option value='1.7' " + ((text_size == 1.7)? "selected='selected'" : "") + ">1.7</option>" +
+                                    "<option value='2' " + ((text_size == 2)? "selected='selected'" : "") + ">2</option>" +
+                                    "<option value='2.3' " + ((text_size == 2.3)? "selected='selected'" : "") + ">2.3</option>" +
+                                    "<option value='2.7' " + ((text_size == 2.7)? "selected='selected'" : "") + ">2.7</option>" +
+                                    "<option value='3' " + ((text_size == 3)? "selected='selected'" : "") + ">3</option>" +
                                 "</select>" +
                             "</div>" +
                             "<div class='eight wide field'>" +
@@ -433,7 +431,7 @@ $(document).ready(function () {
 
             case 'square outline icon':
                 var text_style = feature.getStyle().getText();
-                var text_size = parseInt(((text_style.getFont()).split('px'))[0]);
+                var text_size = text_style.getScale();
                 var line_style = feature.getStyle().getStroke();
                 var line_width = parseInt(line_style.getWidth());
                 var fill_color = feature.getStyle().getFill().getColor();
@@ -444,14 +442,13 @@ $(document).ready(function () {
                             "<div class='eight wide field'>" +
                                 "<label>字體大小</label>" +
                                 "<select id='update_text_size'>" +
-                                    "<option value='8px' " + ((text_size == 8)? "selected='selected'" : "") + ">8</option>" +
-                                    "<option value='9px' " + ((text_size == 9)? "selected='selected'" : "") + ">9</option>" +
-                                    "<option value='10px' " + ((text_size == 10)? "selected='selected'" : "") + ">10</option>" +
-                                    "<option value='11px' " + ((text_size == 11)? "selected='selected'" : "") + ">11</option>" +
-                                    "<option value='12px' " + ((text_size == 12)? "selected='selected'" : "") + ">12</option>" +
-                                    "<option value='13px' " + ((text_size == 13)? "selected='selected'" : "") + ">13</option>" +
-                                    "<option value='20px' " + ((text_size == 20)? "selected='selected'" : "") + ">20</option>" +
-                                    "<option value='40px' " + ((text_size == 40)? "selected='selected'" : "") + ">40</option>" +
+                                    "<option value='1' " + ((text_size == 1)? "selected='selected'" : "") + ">1</option>" +
+                                    "<option value='1.3' " + ((text_size == 1.3)? "selected='selected'" : "") + ">1.3</option>" +
+                                    "<option value='1.7' " + ((text_size == 1.7)? "selected='selected'" : "") + ">1.7</option>" +
+                                    "<option value='2' " + ((text_size == 2)? "selected='selected'" : "") + ">2</option>" +
+                                    "<option value='2.3' " + ((text_size == 2.3)? "selected='selected'" : "") + ">2.3</option>" +
+                                    "<option value='2.7' " + ((text_size == 2.7)? "selected='selected'" : "") + ">2.7</option>" +
+                                    "<option value='3' " + ((text_size == 3)? "selected='selected'" : "") + ">3</option>" +
                                 "</select>" +
                             "</div>" +
                             "<div class='eight wide field'>" +
@@ -561,7 +558,8 @@ $(document).ready(function () {
                         color: "rgba(0,0,0,0)",
                     }),
                     text: new ol.style.Text({
-                        font: $('#update_text_size').val()+" Microsoft Yahei,sans-serif",
+                        font: "Microsoft Yahei,sans-serif",
+                        scale: parseFloat($('#update_text_size').val()),
                         fill: new ol.style.Fill({ color: ($('#update_text_color_picker').val()=="")? text_style.getFill().getColor() : $('#update_text_color_picker').val() }),
                         stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
                         rotation: parseInt($('#update_text_arc').text())*Math.PI/180,
@@ -587,7 +585,8 @@ $(document).ready(function () {
                         color: "rgba(0,0,0,0)",
                     }),
                     text: new ol.style.Text({
-                        font: $('#update_text_size').val()+" Microsoft Yahei,sans-serif",
+                        font: "Microsoft Yahei,sans-serif",
+                        scale: parseFloat($('#update_text_size').val()),
                         fill: new ol.style.Fill({ color: ($('#update_text_color_picker').val()=="")? text_style.getFill().getColor() : $('#update_text_color_picker').val() }),
                         stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
                         rotation: parseInt($('#update_text_arc').text())*Math.PI/180,
@@ -614,7 +613,8 @@ $(document).ready(function () {
                         color: (($('#update_poly_color_picker').val()=="")? poly_color : hexToRgbA($('#update_poly_color_picker').val())),
                     }),
                     text: new ol.style.Text({
-                        font: $('#update_text_size').val()+" Microsoft Yahei,sans-serif",
+                        font: "Microsoft Yahei,sans-serif",
+                        scale: parseFloat($('#update_text_size').val()),
                         fill: new ol.style.Fill({ color: ($('#update_text_color_picker').val()=="")? text_style.getFill().getColor() : $('#update_text_color_picker').val() }),
                         stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
                         rotation: parseInt($('#update_text_arc').text())*Math.PI/180,
@@ -627,9 +627,13 @@ $(document).ready(function () {
         }
 
         // update edit icon
-        if((feature_id.split(' '))[0] == "font" || (feature_id.split(' '))[0] == "home" || (feature_id.split(' '))[0] == "h" || (feature_id.split(' '))[0] == "warning_sign"){
-            for(i=0 ; i<$("#editor > tbody > tr > td:first-child > div").length ; i++)
-                if($($("#editor > tbody > tr > td:first-child > div")[i]).text() == feature_id)
+        for(i=0 ; i<$("#editor > tbody > tr > td:first-child > div").length ; i++){
+            if($($("#editor > tbody > tr > td:first-child > div")[i]).text() == feature_id){
+                if ((feature_id.split(' '))[0] == "line")
+                    $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='arrow left icon'></i>(" + $('#update_text_content').val() + ")");
+                else if ((feature_id.split(' '))[0] == "polygon")
+                    $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='square outline icon'></i>(" + $('#update_text_content').val() + ")");
+                else  // point
                     switch($("input[name=update_point_icon]:checked").val()){
                         case 'none':
                             $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='font icon'></i>(" + $('#update_text_content').val() + ")");
@@ -652,6 +656,8 @@ $(document).ready(function () {
                             feature.setId("warning_sign " + (feature_id.split(' '))[1]);
                             break;
                     }
+                break;
+            }
         }
 
         closer.onclick();
@@ -789,7 +795,7 @@ function setDefaultFeatures(){
     line_width = 0;
     plane_color = "rgba(0, 0, 0, 0)";
     text_content = "";
-    text_size = "12px";
+    text_size = 1;
     text_color = "rgba(0, 0, 0, 0)";
     text_rotation = 0;
     icon_url = "https://openlayers.org/en/v4.1.1/examples/data/icon.png";
@@ -823,7 +829,7 @@ function drawLine(){
 
     text_content = $('#line_text_content').val();//content;
     text_color = $('#line_menu > .fields').first().children(".field:nth-child(2)").children('.color_picker').val();//color;
-    text_size = $('#line_text_size').val();//size;
+    text_size = parseFloat($('#line_text_size').val());//size;
     text_rotation = parseInt($('#line_text_arc').text())*Math.PI/180;
 
     line_color = $('#line_menu > .fields:nth-child(4)').children(".field:nth-child(2)").children('.color_picker').val();
@@ -838,7 +844,7 @@ function drawPolygon(){
 
     text_content = $('#poly_text_content').val();//content;
     text_color = $('#poly_menu > .fields').first().children(".field:nth-child(2)").children('.color_picker').val();//color;
-    text_size = $('#poly_text_size').val();//size;
+    text_size = parseFloat($('#poly_text_size').val());//size;
     text_rotation = parseInt($('#poly_text_arc').text())*Math.PI/180;
 
     line_color = $('#poly_menu > .fields:nth-child(4)').children(".field:nth-child(2)").children('.color_picker').val();
@@ -868,7 +874,7 @@ function drawIconText(/*content,color,size,rotation*/){
     type = "Point";
     text_content = $('#point_text_content').val();//content;
     text_color = $('#point_menu > .fields').first().children(".field:nth-child(2)").children('.color_picker').val();//color;
-    text_size = $('#point_text_size').val();//size;
+    text_size = parseFloat($('#point_text_size').val());//size;
     text_rotation = parseInt($('#point_text_arc').html())*Math.PI/180;
     var draw_type = "font";
     if ($("input[name=point_icon]:checked").val() != "none") {
@@ -892,7 +898,7 @@ function putIcon(url){
 
     text_content = $('#icon_text').val();//content;
     text_color = "rgb(0,0,0)";
-    text_size = "20px";
+    text_size = 1;
 
     var draw_type = "";
     switch(icon_url){
@@ -928,7 +934,8 @@ function runBrush(draw_type) {
                 color: plane_color,
             }),
             text: new ol.style.Text({
-                font: text_size+" Microsoft Yahei,sans-serif",
+                font: "Microsoft Yahei,sans-serif",
+                scale: text_size,
                 fill: new ol.style.Fill({ color: text_color }),
                 stroke: new ol.style.Stroke({color: 'yellow', width: 0.8}),
                 rotation: text_rotation,
@@ -1145,7 +1152,7 @@ function addInteraction() {
                     measureTooltip.setPosition(tooltipCoord);
                 });
             }
-            
+
         }, this);
 
     measure_draw.on('drawend',
