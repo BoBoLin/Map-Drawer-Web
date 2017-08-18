@@ -998,7 +998,7 @@ function getImage(){
             anchor: [0.5, 46],
             anchorXUnits: 'fraction',
             anchorYUnits: 'pixels',
-            scale: 0.125,
+            scale: 1,
             src: icon_url,
         }));
     }
