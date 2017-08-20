@@ -257,9 +257,9 @@ $(document).ready(function () {
         map.getView().setZoom(10);
     });
 
-    $(document).on('click', '.edit.button', function () {
+    $(document).on('click', '.edit.button', function () {        
         var feature_id = $(this).parent().siblings("td").first().children("div").text();
-        var feature = featureOverlay.getSource().getFeatureById(feature_id);
+        var feature = featureOverlay.getSource().getFeatureById(feature_id);    
         if (feature_id.split(' ')[0] == "polygon") {
             var coord = feature.getGeometry().getCoordinates()[0][0];
         }else if(feature_id.split(' ')[0] == "line"){
