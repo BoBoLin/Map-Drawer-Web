@@ -51,6 +51,7 @@ $(document).ready(function () {
     var exportKMLElement = document.getElementById('export-kml');
     exportKMLElement.addEventListener('click', function(e) {
         var vectorSource = featureOverlay.getSource();
+        var mVectorSource = measure.getSource();
         var features = [];
         var myTexts = [];
         vectorSource.forEachFeature(function(feature) {
@@ -59,6 +60,10 @@ $(document).ready(function () {
             var rotation = feature.getStyle().getText().getRotation();
             var myText = {text:text,pos:pos,rotation:rotation};
             myTexts.push(myText);
+            features.push(feature);
+        });
+        // measure layer
+        mVectorSource.forEachFeature(function(feature){
             features.push(feature);
         });
         var format = new ol.format.KML();
