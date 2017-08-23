@@ -50,19 +50,47 @@ $(document).ready(function () {
     /*************** export KML **************/
     var exportKMLElement = document.getElementById('export-kml');
     exportKMLElement.addEventListener('click', function(e) {
-        var vectorSource = featureOverlay.getSource();
+        var sourceProj = map.getView().getProjection();
+        var vectorSource;
         var features = [];
         var myTexts = [];
-        vectorSource.forEachFeature(function(feature) {
-            var text = feature.getStyle().getText().getText();
-            var pos = getPosition(feature);
-            var rotation = feature.getStyle().getText().getRotation();
-            var myText = {text:text,pos:pos,rotation:rotation};
-            myTexts.push(myText);
-            features.push(feature);
-        });
+        if(featureOverlay){
+            vectorSource = featureOverlay.getSource(); 
+            vectorSource.forEachFeature(function(feature) {               
+                feature.setGeometry(feature.getGeometry().clone().transform(sourceProj, 'EPSG:4326') );
+                var text = feature.getStyle().getText().getText();
+                var pos = getPosition(feature);
+                var rotation = feature.getStyle().getText().getRotation();
+                var myText = {text:text,pos:pos,rotation:rotation};
+                myTexts.push(myText);
+                features.push(feature);
+            });                       
+        }
+        // measure layer
+        var mVectorSource;
+        if(measure){
+            mVectorSource = measure.getSource();        
+            mVectorSource.forEachFeature(function(feature){
+                feature.setGeometry(feature.getGeometry().clone().transform(sourceProj, 'EPSG:4326') );
+                features.push(feature);
+            });
+        }
         var format = new ol.format.KML();
         var kml_str = format.writeFeatures(features);
+        if(featureOverlay){
+            vectorSource = featureOverlay.getSource(); 
+            vectorSource.forEachFeature(function(feature) {
+                feature.setGeometry(feature.getGeometry().clone().transform('EPSG:4326', sourceProj) );
+            });                       
+        }
+        // measure layer
+        var mVectorSource;
+        if(measure){
+            mVectorSource = measure.getSource();        
+            mVectorSource.forEachFeature(function(feature){
+                feature.setGeometry(feature.getGeometry().clone().transform('EPSG:4326', sourceProj) );
+            });
+        }        
         var doc = $.parseXML(kml_str);
         var objs = $(doc).find("Placemark");
         for(var i=0;i<objs.size();i++){
@@ -105,7 +133,7 @@ function import_kml_string(kml_str) {
     var rmStartId = featureOverlay.getSource().getFeatures().length;
     var format = new ol.format.KML();
     featureOverlay.getSource().addFeatures(format.readFeatures(kml_str));
-    featureOverlay.setMap(map);
+    featureOverlay.setMap(map);    
     var features = featureOverlay.getSource().getFeatures();
     for(i = rmStartId;i<features.length;i++){ // remove previous kml id to prevent error (don not remove id in the map)
         features[i].setId("undefined "+i);
@@ -130,14 +158,13 @@ function import_kml_string(kml_str) {
         text_color = getTextColor(rootTag,styleId);
         text_size = getTextSize(rootTag,styleId);
         text_rotation = getTextRotation(isGE,rootTag);
-        var consoleText = [text_content,text_color,text_size,text_rotation];
         // get feature by coordinate and set feature's style
         var coorstr = $(objs[i]).find("coordinates").text();    
         var coorXYarr = getCoorXYarr(coorstr);
         var features = featureOverlay.getSource().getFeatures();
         var feature = getFeatureByCoor(features,coorXYarr); 
         var s = getMyKMLstyle();
-        feature.setStyle(s);
+        feature.setStyle(s);       
         // make feature editable
         var draw_type = getDrawType(type);
         feature.setId(draw_type+" "+$cnt);
@@ -165,6 +192,12 @@ function import_kml_string(kml_str) {
         );  
         $cnt ++; //global variable in draw.js      
     }
+    // transform projection of features     
+    var sourceProj = map.getView().getProjection();
+    vectorSource = featureOverlay.getSource(); 
+    vectorSource.forEachFeature(function(feature) {
+        feature.setGeometry(feature.getGeometry().clone().transform('EPSG:4326', sourceProj) );
+    });    
     // draw on map
     var load_interaction = new ol.interaction.Modify({
         features: new ol.Collection(featureOverlay.getSource().getFeatures())
@@ -244,24 +277,22 @@ function getCoorXYarr(coorstr){
 }
 
 function getFeatureByCoor(features,coorXYarr){
-    for2: for(var i=0;i<features.length;i++){
-        var fCoor = getPosition(features[i]);
+    for2: for(var i=0;i<features.length;i++){      
+        var fCoor = getPosition(features[i]);   
         if(fCoor.length!=coorXYarr.length){
-            //console.log("array length not match");
             continue;
         }
         for(var j=0;j<fCoor.length;j++){
             if(fCoor[j][0]!=parseFloat(coorXYarr[j][0]) ){
-                //console.log("pos 0 not match");
                 continue for2;
             }
             if(fCoor[j][1]!=parseFloat(coorXYarr[j][1]) ){
-                //console.log("pos 1 not match");
                 continue for2;
             }
         }
         return features[i];
     }
+    console.log("no return");
 }
 
 function getPosition(feature){

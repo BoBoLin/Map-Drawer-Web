@@ -188,8 +188,7 @@ $(document).ready(function () {
         overlays: [popup_overlay],
         target: 'map',
         view: new ol.View({
-            projection: 'EPSG:4326',
-            center: [120.594013,23.267667],
+            center: ol.proj.transform([120.594013,23.267667], 'EPSG:4326', 'EPSG:3857'),
             zoom: 8
         })
     });
