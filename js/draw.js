@@ -1116,6 +1116,8 @@ function addInteraction() {
     var listener;
     measure_draw.on('drawstart',
         function(evt) {
+
+            
             // set sketch
             sketch = evt.feature;
             /** @type {ol.Coordinate|undefined} */
@@ -1124,17 +1126,20 @@ function addInteraction() {
 
             if(type == "Point")
             {
+
+                var normalCoord = 0;
                 //得到經緯度座標
                 coord = evt.feature.getGeometry().getCoordinates();
-                output = coord;
-
+                //normalCoord = ol.proj.transform(coord, 'EPSG:3857', 'EPSG:4326')
+                normalCoord = coord;
                 //顯示取到四捨五入第四位
                 var size = Math.pow(10, 4);
-                output[0] = Math.round(output[0] * size) / size ;
-                output[1] = Math.round(output[1] * size) / size ;
+                normalCoord[0] = Math.round(normalCoord[0] * size) / size ;
+                normalCoord[1] = Math.round(normalCoord[1] * size) / size ;
 
-                measureTooltipElement.innerHTML = output;
+                measureTooltipElement.innerHTML = normalCoord;
                 measureTooltip.setPosition(coord);
+
             }
             else
             {
