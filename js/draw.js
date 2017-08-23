@@ -1129,8 +1129,8 @@ function addInteraction() {
                 var normalCoord = 0;
                 //得到經緯度座標
                 coord = evt.feature.getGeometry().getCoordinates();
-                //normalCoord = ol.proj.transform(coord, 'EPSG:3857', 'EPSG:4326')
-                normalCoord = coord;
+                normalCoord = ol.proj.transform(coord, 'EPSG:3857', 'EPSG:4326')
+                
                 //顯示取到四捨五入第四位
                 var size = Math.pow(10, 4);
                 normalCoord[0] = Math.round(normalCoord[0] * size) / size ;
