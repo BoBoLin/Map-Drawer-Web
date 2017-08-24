@@ -4,6 +4,7 @@ var featureOverlay;
 var popup_overlay;
 var features;
 var modify;
+var want_modify_feature;
 var typeSelect
 
 var measure;
@@ -141,8 +142,15 @@ $(document).ready(function () {
     $(".color_picker").spectrum({
         preferredFormat: "hex",
         color: "#000000",
-        showButtons: false,
-        change: function(color) {
+        showPaletteOnly: true,
+        showPalette:true,
+        hideAfterPaletteSelect:true,
+        palette: [
+            ['#000000', 'white', '#76060C',
+            'rgb(255, 128, 0);', 'hsv 100 70 50'],
+            ['red', '#660066', 'green', 'blue', 'violet']
+        ],
+        hide: function(color) {
             $(this).parent().children('input').trigger("input");
         }
     });
@@ -202,7 +210,7 @@ $(document).ready(function () {
         })
     });
 
-    var want_modify_feature = new ol.Collection();
+    want_modify_feature = new ol.Collection();
     modify = new ol.interaction.Modify({
         features: want_modify_feature,
         // the SHIFT key must be pressed to delete vertices, so
@@ -249,7 +257,7 @@ $(document).ready(function () {
         clear_helptooltip();
         drawLine();
     });
-    $("#line_text_size, #line_size, input[name='point_icon']").change(function () {
+    $("#line_text_size, #line_size").change(function () {
         map.removeInteraction(draw); // remove old brush
         map.removeInteraction(measure_draw);
         clear_helptooltip();
@@ -269,7 +277,7 @@ $(document).ready(function () {
         clear_helptooltip();
         drawPolygon();
     });
-    $("#poly_text_size, #poly_size, #poly_border_size, input[name='point_icon']").change(function () {
+    $("#poly_text_size, #poly_size, #poly_border_size").change(function () {
         map.removeInteraction(draw); // remove old brush
         map.removeInteraction(measure_draw);
         clear_helptooltip();
@@ -352,7 +360,7 @@ $(document).ready(function () {
                             "</div>" +
                             "<div class='eight wide field'>" +
                                 "<label>字顏色</label>" +
-                                "<input type='text' id='update_color_picker' />" +
+                                "<input type='text' id='update_text_color_picker' />" +
                             "</div>" +
                         "</div>" +
                         "<div class='field'>" +
@@ -383,10 +391,20 @@ $(document).ready(function () {
                         "</div>" +
                     "</div>";
 
-                $("#update_color_picker").spectrum({
+                $("#update_text_color_picker").spectrum({
                     preferredFormat: "hex",
                     color: text_style.getFill().getColor(),
-                    chooseText: "套用"
+                    showPaletteOnly: true,
+                    showPalette:true,
+                    hideAfterPaletteSelect:true,
+                    palette: [
+                        ['black', 'white', '#76060C',
+                        'rgb(255, 128, 0);', 'hsv 100 70 50'],
+                        ['red', '#660066', 'green', 'blue', 'violet']
+                    ],
+                    hide: function(color) {
+                        update_feature();
+                    }
                 });
 
                 $('.ui.range').range({
@@ -396,6 +414,8 @@ $(document).ready(function () {
                     step: 30,
                     onChange: function(value) {
                         $('#update_text_arc').html(value);
+                        console.log("sdljfs");
+                        update_feature();
                     }
                 });
                 break;
@@ -458,12 +478,32 @@ $(document).ready(function () {
                 $("#update_text_color_picker").spectrum({
                     preferredFormat: "hex",
                     color: text_style.getFill().getColor(),
-                    chooseText: "套用"
+                    showPaletteOnly: true,
+                    showPalette:true,
+                    hideAfterPaletteSelect:true,
+                    palette: [
+                        ['black', 'white', '#76060C',
+                        'rgb(255, 128, 0);', 'hsv 100 70 50'],
+                        ['red', '#660066', 'green', 'blue', 'violet']
+                    ],
+                    hide: function(color) {
+                        update_feature();
+                    }
                 });
                 $("#update_line_color_picker").spectrum({
                     preferredFormat: "hex",
                     color: line_style.getColor(),
-                    chooseText: "套用"
+                    showPaletteOnly: true,
+                    showPalette:true,
+                    hideAfterPaletteSelect:true,
+                    palette: [
+                        ['black', 'white', '#76060C',
+                        'rgb(255, 128, 0);', 'hsv 100 70 50'],
+                        ['red', '#660066', 'green', 'blue', 'violet']
+                    ],
+                    hide: function(color) {
+                        update_feature();
+                    }
                 });
 
                 $('.ui.range').range({
@@ -473,6 +513,7 @@ $(document).ready(function () {
                     step: 30,
                     onChange: function(value) {
                         $('#update_text_arc').html(value);
+                        update_feature();
                     }
                 });
                 break;
@@ -539,17 +580,47 @@ $(document).ready(function () {
                 $("#update_text_color_picker").spectrum({
                     preferredFormat: "hex",
                     color: text_style.getFill().getColor(),
-                    chooseText: "套用"
+                    showPaletteOnly: true,
+                    showPalette:true,
+                    hideAfterPaletteSelect:true,
+                    palette: [
+                        ['black', 'white', '#76060C',
+                        'rgb(255, 128, 0);', 'hsv 100 70 50'],
+                        ['red', '#660066', 'green', 'blue', 'violet']
+                    ],
+                    hide: function(color) {
+                        update_feature();
+                    }
                 });
                 $("#update_border_color_picker").spectrum({
                     preferredFormat: "hex",
                     color: line_style.getColor(),
-                    chooseText: "套用"
+                    showPaletteOnly: true,
+                    showPalette:true,
+                    hideAfterPaletteSelect:true,
+                    palette: [
+                        ['black', 'white', '#76060C',
+                        'rgb(255, 128, 0);', 'hsv 100 70 50'],
+                        ['red', '#660066', 'green', 'blue', 'violet']
+                    ],
+                    hide: function(color) {
+                        update_feature();
+                    }
                 });
                 $("#update_poly_color_picker").spectrum({
                     preferredFormat: "hex",
                     color: fill_color,
-                    chooseText: "套用"
+                    showPaletteOnly: true,
+                    showPalette:true,
+                    hideAfterPaletteSelect:true,
+                    palette: [
+                        ['black', 'white', '#76060C',
+                        'rgb(255, 128, 0);', 'hsv 100 70 50'],
+                        ['red', '#660066', 'green', 'blue', 'violet']
+                    ],
+                    hide: function(color) {
+                        update_feature();
+                    }
                 });
 
                 $('.ui.range').range({
@@ -559,10 +630,17 @@ $(document).ready(function () {
                     step: 30,
                     onChange: function(value) {
                         $('#update_text_arc').html(value);
+                        update_feature();
                     }
                 });
                 break;
         }
+    });
+    $(document).on('change', "#update_text_size,#update_line_size,#update_border_size,input[name='update_point_icon']", function () {
+        update_feature();
+    });
+    $(document).on('input', '#update_text_content', function () {
+        update_feature();
     });
 
     $(document).on('click', '.remove.button', function () {
@@ -571,146 +649,6 @@ $(document).ready(function () {
         $(this).parent().parent().remove();
     });
     /************ !menu button listener ***********/
-
-    /*************** update feature **************/
-    $('#update').click(function () {
-        var feature_id = $(this).siblings("#popup-content").children("div").first().text();
-        var feature = featureOverlay.getSource().getFeatureById(feature_id);
-        want_modify_feature.remove(feature);
-        console.log((feature_id.split(' '))[0]);
-
-        switch((feature_id.split(' '))[0]){
-            case 'font':
-            case 'home':
-            case 'h':
-            case 'warning_sign':
-                var text_style = feature.getStyle().getText();
-                var new_style = new ol.style.Style({
-                    image: (($("input[name=update_point_icon]:checked").val()=="none")?
-                                new ol.style.Circle({
-                                    radius: 0,
-                                    fill: new ol.style.Fill({ color: "rgba(0,0,0,0)",})
-                                }) :
-                                new ol.style.Icon({
-                                    anchor: [0.5, 46],
-                                    anchorXUnits: 'fraction',
-                                    anchorYUnits: 'pixels',
-                                    scale: 0.125,
-                                    src: $("input[name=update_point_icon]:checked").val(),
-                                })),
-                    stroke: new ol.style.Stroke({
-                        color: "rgba(0,0,0,0)",
-                        width: 0,
-                    }),
-                    fill: new ol.style.Fill({
-                        color: "rgba(0,0,0,0)",
-                    }),
-                    text: new ol.style.Text({
-                        font: "Microsoft Yahei,sans-serif",
-                        scale: parseFloat($('#update_text_size').val()),
-                        fill: new ol.style.Fill({ color: ($('#update_text_color_picker').val()=="")? text_style.getFill().getColor() : $('#update_text_color_picker').val() }),
-                        stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
-                        rotation: parseInt($('#update_text_arc').text())*Math.PI/180,
-                        text: $('#update_text_content').val(),
-                        offsetY: -10
-                    })
-                });
-                feature.setStyle(new_style);
-                break;
-            case 'line':
-                var text_style = feature.getStyle().getText();
-                var line_style = feature.getStyle().getStroke();
-                var new_style = new ol.style.Style({
-                    image: new ol.style.Circle({
-                        radius: 0,
-                        fill: new ol.style.Fill({ color: "rgba(0,0,0,0)",})
-                    }) ,
-                    stroke: new ol.style.Stroke({
-                        color: (($('#update_line_color_picker').val()=="")? line_style.getColor() : $('#update_line_color_picker').val()),
-                        width: parseInt($('#update_line_size').val()),
-                    }),
-                    fill: new ol.style.Fill({
-                        color: "rgba(0,0,0,0)",
-                    }),
-                    text: new ol.style.Text({
-                        font: "Microsoft Yahei,sans-serif",
-                        scale: parseFloat($('#update_text_size').val()),
-                        fill: new ol.style.Fill({ color: ($('#update_text_color_picker').val()=="")? text_style.getFill().getColor() : $('#update_text_color_picker').val() }),
-                        stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
-                        rotation: parseInt($('#update_text_arc').text())*Math.PI/180,
-                        text: $('#update_text_content').val(),
-                        offsetY: -10
-                    })
-                });
-                feature.setStyle(new_style);
-                break;
-            case 'polygon':
-                var text_style = feature.getStyle().getText();
-                var line_style = feature.getStyle().getStroke();
-                var poly_color = feature.getStyle().getFill().getColor();
-                var new_style = new ol.style.Style({
-                    image: new ol.style.Circle({
-                        radius: 0,
-                        fill: new ol.style.Fill({ color: "rgba(0,0,0,0)",})
-                    }),
-                    stroke: new ol.style.Stroke({
-                        color: (($('#update_border_color_picker').val()=="")? line_style.getColor() : $('#update_border_color_picker').val()),
-                        width: parseInt($('#update_border_size').val()),
-                    }),
-                    fill: new ol.style.Fill({
-                        color: (($('#update_poly_color_picker').val()=="")? poly_color : hexToRgbA($('#update_poly_color_picker').val())),
-                    }),
-                    text: new ol.style.Text({
-                        font: "Microsoft Yahei,sans-serif",
-                        scale: parseFloat($('#update_text_size').val()),
-                        fill: new ol.style.Fill({ color: ($('#update_text_color_picker').val()=="")? text_style.getFill().getColor() : $('#update_text_color_picker').val() }),
-                        stroke: new ol.style.Stroke({color: 'yellow', width: 1}),
-                        rotation: parseInt($('#update_text_arc').text())*Math.PI/180,
-                        text: $('#update_text_content').val(),
-                        offsetY: -10
-                    })
-                });
-                feature.setStyle(new_style);
-                break;
-        }
-
-        // update edit icon
-        for(i=0 ; i<$("#editor > tbody > tr > td:first-child > div").length ; i++){
-            if($($("#editor > tbody > tr > td:first-child > div")[i]).text() == feature_id){
-                if ((feature_id.split(' '))[0] == "line")
-                    $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='arrow left icon'></i>(" + $('#update_text_content').val() + ")");
-                else if ((feature_id.split(' '))[0] == "polygon")
-                    $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='square outline icon'></i>(" + $('#update_text_content').val() + ")");
-                else  // point
-                    switch($("input[name=update_point_icon]:checked").val()){
-                        case 'none':
-                            $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='font icon'></i>(" + $('#update_text_content').val() + ")");
-                            $($("#editor > tbody > tr > td:first-child > div")[i]).text("font " + (feature_id.split(' '))[1]);
-                            feature.setId("font " + (feature_id.split(' '))[1]);
-                            break;
-                        case 'img/marker01.png':
-                            $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='home icon'></i>(" + $('#update_text_content').val() + ")");
-                            $($("#editor > tbody > tr > td:first-child > div")[i]).text("home " + (feature_id.split(' '))[1]);
-                            feature.setId("home " + (feature_id.split(' '))[1]);
-                            break;
-                        case 'img/marker02.png':
-                            $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='h icon'></i>(" + $('#update_text_content').val() + ")");
-                            $($("#editor > tbody > tr > td:first-child > div")[i]).text("h " + (feature_id.split(' '))[1]);
-                            feature.setId("h " + (feature_id.split(' '))[1]);
-                            break;
-                        case 'img/marker03.png':
-                            $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='warning sign icon'></i>(" + $('#update_text_content').val() + ")");
-                            $($("#editor > tbody > tr > td:first-child > div")[i]).text("warning_sign " + (feature_id.split(' '))[1]);
-                            feature.setId("warning_sign " + (feature_id.split(' '))[1]);
-                            break;
-                    }
-                break;
-            }
-        }
-
-        closer.onclick();
-    });
-    /*************** !update feature *************/
 
     /*************** measure *************/
     /**
@@ -807,6 +745,149 @@ $(document).ready(function () {
     /*************** !measure *************/
 
 });
+
+function update_feature() {
+    var feature_id = $('#update').siblings("#popup-content").children("div").first().text();
+    var feature = featureOverlay.getSource().getFeatureById(feature_id);
+    want_modify_feature.remove(feature);
+    console.log((feature_id.split(' '))[0]);
+
+    switch((feature_id.split(' '))[0]){
+        case 'font':
+        case 'home':
+        case 'h':
+        case 'warning_sign':
+            console.log($('#update_text_color_picker').val());
+            var text_style = feature.getStyle().getText();
+            var new_style = new ol.style.Style({
+                image: (($("input[name=update_point_icon]:checked").val()=="none")?
+                            new ol.style.Circle({
+                                radius: 0,
+                                fill: new ol.style.Fill({ color: "rgba(0,0,0,0)",})
+                            }) :
+                            new ol.style.Icon({
+                                anchor: [0.5, 46],
+                                anchorXUnits: 'fraction',
+                                anchorYUnits: 'pixels',
+                                scale: 1,
+                                src: $("input[name=update_point_icon]:checked").val(),
+                            })),
+                stroke: new ol.style.Stroke({
+                    color: "rgba(0,0,0,0)",
+                    width: 0,
+                }),
+                fill: new ol.style.Fill({
+                    color: "rgba(0,0,0,0)",
+                }),
+                text: new ol.style.Text({
+                    font: "Microsoft Yahei,sans-serif",
+                    scale: parseFloat($('#update_text_size').val()),
+                    fill: new ol.style.Fill({ color: ($('#update_text_color_picker').val()=="")? text_style.getFill().getColor() : $('#update_text_color_picker').val() }),
+                    stroke: new ol.style.Stroke({color: '#660066', width: 1}),
+                    rotation: parseInt($('#update_text_arc').text())*Math.PI/180,
+                    text: $('#update_text_content').val(),
+                    offsetY: -10
+                })
+            });
+            feature.setStyle(new_style);
+            break;
+        case 'line':
+            var text_style = feature.getStyle().getText();
+            var line_style = feature.getStyle().getStroke();
+            var new_style = new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: 0,
+                    fill: new ol.style.Fill({ color: "rgba(0,0,0,0)",})
+                }) ,
+                stroke: new ol.style.Stroke({
+                    color: (($('#update_line_color_picker').val()=="")? line_style.getColor() : $('#update_line_color_picker').val()),
+                    width: parseInt($('#update_line_size').val()),
+                }),
+                fill: new ol.style.Fill({
+                    color: "rgba(0,0,0,0)",
+                }),
+                text: new ol.style.Text({
+                    font: "Microsoft Yahei,sans-serif",
+                    scale: parseFloat($('#update_text_size').val()),
+                    fill: new ol.style.Fill({ color: ($('#update_text_color_picker').val()=="")? text_style.getFill().getColor() : $('#update_text_color_picker').val() }),
+                    stroke: new ol.style.Stroke({color: '#660066', width: 1}),
+                    rotation: parseInt($('#update_text_arc').text())*Math.PI/180,
+                    text: $('#update_text_content').val(),
+                    offsetY: -10
+                })
+            });
+            feature.setStyle(new_style);
+            break;
+        case 'polygon':
+            var text_style = feature.getStyle().getText();
+            var line_style = feature.getStyle().getStroke();
+            var poly_color = feature.getStyle().getFill().getColor();
+            var new_style = new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: 0,
+                    fill: new ol.style.Fill({ color: "rgba(0,0,0,0)",})
+                }),
+                stroke: new ol.style.Stroke({
+                    color: (($('#update_border_color_picker').val()=="")? line_style.getColor() : $('#update_border_color_picker').val()),
+                    width: parseInt($('#update_border_size').val()),
+                }),
+                fill: new ol.style.Fill({
+                    color: (($('#update_poly_color_picker').val()=="")? poly_color : hexToRgbA($('#update_poly_color_picker').val())),
+                }),
+                text: new ol.style.Text({
+                    font: "Microsoft Yahei,sans-serif",
+                    scale: parseFloat($('#update_text_size').val()),
+                    fill: new ol.style.Fill({ color: ($('#update_text_color_picker').val()=="")? text_style.getFill().getColor() : $('#update_text_color_picker').val() }),
+                    stroke: new ol.style.Stroke({color: '#660066', width: 1}),
+                    rotation: parseInt($('#update_text_arc').text())*Math.PI/180,
+                    text: $('#update_text_content').val(),
+                    offsetY: -10
+                })
+            });
+            feature.setStyle(new_style);
+            break;
+    }
+
+    // update edit icon
+    for(i=0 ; i<$("#editor > tbody > tr > td:first-child > div").length ; i++){
+        if($($("#editor > tbody > tr > td:first-child > div")[i]).text() == feature_id){
+            if ((feature_id.split(' '))[0] == "line")
+                $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='arrow left icon'></i>(" + $('#update_text_content').val() + ")");
+            else if ((feature_id.split(' '))[0] == "polygon")
+                $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='square outline icon'></i>(" + $('#update_text_content').val() + ")");
+            else  // point
+                switch($("input[name=update_point_icon]:checked").val()){
+                    case 'none':
+                        $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='font icon'></i>(" + $('#update_text_content').val() + ")");
+                        $($("#editor > tbody > tr > td:first-child > div")[i]).text("font " + (feature_id.split(' '))[1]);
+                        feature.setId("font " + (feature_id.split(' '))[1]);
+                        $('#popup > #popup-content > div:first-child').text("font " + (feature_id.split(' '))[1]);
+                        break;
+                    case 'img/marker01.png':
+                        $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='home icon'></i>(" + $('#update_text_content').val() + ")");
+                        $($("#editor > tbody > tr > td:first-child > div")[i]).text("home " + (feature_id.split(' '))[1]);
+                        feature.setId("home " + (feature_id.split(' '))[1]);
+                        $('#popup > #popup-content > div:first-child').text("home " + (feature_id.split(' '))[1]);
+                        break;
+                    case 'img/marker02.png':
+                        $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='h icon'></i>(" + $('#update_text_content').val() + ")");
+                        $($("#editor > tbody > tr > td:first-child > div")[i]).text("h " + (feature_id.split(' '))[1]);
+                        feature.setId("h " + (feature_id.split(' '))[1]);
+                        $('#popup > #popup-content > div:first-child').text("h " + (feature_id.split(' '))[1]);
+                        break;
+                    case 'img/marker03.png':
+                        $($("#editor > tbody > tr > td:first-child > div")[i]).parent().siblings("td").first().html("<i class='warning sign icon'></i>(" + $('#update_text_content').val() + ")");
+                        $($("#editor > tbody > tr > td:first-child > div")[i]).text("warning_sign " + (feature_id.split(' '))[1]);
+                        feature.setId("warning_sign " + (feature_id.split(' '))[1]);
+                        $('#popup > #popup-content > div:first-child').text("warning_sign " + (feature_id.split(' '))[1]);
+                        break;
+                }
+            break;
+        }
+    }
+
+    //document.getElementById('popup-closer').onclick();
+}
 
 
 // transfer kml color code "abgr" to normal hex color code "#rgb"
@@ -985,7 +1066,7 @@ function runBrush(draw_type) {
                 font: "Microsoft Yahei,sans-serif",
                 scale: text_size,
                 fill: new ol.style.Fill({ color: text_color }),
-                stroke: new ol.style.Stroke({color: 'yellow', width: 0.8}),
+                stroke: new ol.style.Stroke({color: '#660066', width: 0.8}),
                 rotation: text_rotation,
                 text: text_content,
                 offsetY: -10
