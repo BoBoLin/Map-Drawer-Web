@@ -211,6 +211,9 @@ $(document).ready(function () {
         if( $(this).data("tab") === "one" ){
             map_move_mode();
         }
+        else if( $(this).data("tab") === "five"){ //measure on change
+            measure_start();
+        }
     });
 
     $('#point_button').click(function () {
@@ -234,9 +237,9 @@ $(document).ready(function () {
         drawPolygon();
     });
 
-    $('#measure_button').click(function(){
+    /*$('#measure_button').click(function(){
         measure_start();
-    })
+    })*/
 
     $(document).on('click', '.search.button', function () {
         var feature_id = $(this).parent().siblings("td").first().children("div").text();
@@ -664,15 +667,19 @@ $(document).ready(function () {
     /*************** !update feature *************/
 
     /*************** measure *************/
+
+    typeSelect = document.getElementById('type');
+
     /**
     * Let user change the geometry type.
     */
-    //typeSelect.onchange = function() {
-      //  map.removeInteraction(measure_draw);
+    typeSelect.onchange = function() {
+        map.removeInteraction(measure_draw);
         //addInteraction();
-    //};
+        measure_start();
+    };
 
-    typeSelect = document.getElementById('type');
+    //ypeSelect = document.getElementById('type');
 
     function measure_start(){
 
