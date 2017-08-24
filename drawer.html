@@ -50,11 +50,11 @@
                             <!-- select -->
                             <a class="item" data-tab="one"><img src="img/paint01.png" alt=""></a>
                             <!-- text -->
-                            <a class="item" data-tab="two"><img src="img/paint02.png" alt=""></a>
+                            <a class="item" data-tab="two" id="point_button"><img src="img/paint02.png" alt=""></a>
                             <!-- icon -->
-                            <a class="item" data-tab="three"><img src="img/paint04.png" alt=""></a>
+                            <a class="item" data-tab="three" id="line_button"><img src="img/paint04.png" alt=""></a>
                             <!-- arrow -->
-                            <a class="item" data-tab="four"><img src="img/paint03.png" alt=""></a>
+                            <a class="item" data-tab="four" id="poly_button"><img src="img/paint03.png" alt=""></a>
                             <!-- measure -->
                             <a class="item" data-tab="five"><img src="img/paint05.png" alt=""></a>
                         </div>
@@ -74,7 +74,7 @@
                                     </div>
                                     <div class="eight wide field">
                                         <label>顏色</label>
-                                        <input type='text' class="color_picker" value="#000000" />
+                                        <input type='text' class="color_picker" id="point_text_color" value="#000000" />
                                     </div>
                                 </div>
                                 <div class="field">
@@ -103,7 +103,6 @@
                                     <label>角度：<span id="point_text_arc"></span></label>
                                     <div class="ui brown range" id="point_arc_ranger"></div>
                                 </div>
-                                <button class="ui button" id="point_button">套用</button>
                             </div>
                         </div>
                         <!-- line -->
@@ -121,7 +120,7 @@
                                     </div>
                                     <div class="eight wide field">
                                         <label>字顏色</label>
-                                        <input type='text' class="color_picker" value="#000000" />
+                                        <input type='text' class="color_picker" id="line_text_color" value="#000000" />
                                     </div>
                                 </div>
                                 <div class="field">
@@ -144,10 +143,9 @@
                                     </div>
                                     <div class="eight wide field">
                                         <label>線顏色</label>
-                                        <input type='text' class="color_picker" value="#000000" />
+                                        <input type='text' class="color_picker" id="line_color" value="#000000" />
                                     </div>
                                 </div>
-                                <button class="ui button" id="line_button">套用</button>
                             </div>
                         </div>
                         <!-- polygon -->
@@ -165,7 +163,7 @@
                                     </div>
                                     <div class="eight wide field">
                                         <label>字顏色</label>
-                                        <input type='text' class="color_picker" value="#000000" />
+                                        <input type='text' class="color_picker" id="poly_text_color" value="#000000" />
                                     </div>
                                 </div>
                                 <div class="field">
@@ -188,14 +186,13 @@
                                     </div>
                                     <div class="four wide field">
                                         <label>邊框顏色</label>
-                                        <input type='text' class="color_picker" value="#000000" />
+                                        <input type='text' class="color_picker" id="poly_line_color" value="#000000" />
                                     </div>
                                     <div class="field">
                                         <label>多邊形顏色</label>
-                                        <input type='text' class="color_picker" value="#000000" />
+                                        <input type='text' class="color_picker" id="poly_color" value="#000000" />
                                     </div>
                                 </div>
-                                <button class="ui button" id="poly_button">套用</button>
                             </div>
                         </div>
                         <div class="ui tab segment" data-tab="five">

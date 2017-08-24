@@ -60,6 +60,7 @@ $(document).ready(function () {
                             step: 30,
                             onChange: function(value) {
                                 $("#point_text_arc").html(value);
+                                $("#point_text_arc").trigger('input');
                             }
                         });
                         break;
@@ -71,6 +72,7 @@ $(document).ready(function () {
                             step: 30,
                             onChange: function(value) {
                                 $("#line_text_arc").html(value);
+                                $("#line_text_arc").trigger('input');
                             }
                         });
                         break;
@@ -82,6 +84,7 @@ $(document).ready(function () {
                             step: 30,
                             onChange: function(value) {
                                 $("#poly_text_arc").html(value);
+                                $("#poly_text_arc").trigger('input');
                             }
                         });
                         break;
@@ -103,6 +106,7 @@ $(document).ready(function () {
                         step: 30,
                         onChange: function(value) {
                             $("#point_text_arc").html(value);
+                            $("#point_text_arc").trigger('input');
                         }
                     });
                     break;
@@ -114,6 +118,7 @@ $(document).ready(function () {
                         step: 30,
                         onChange: function(value) {
                             $("#line_text_arc").html(value);
+                            $("#line_text_arc").trigger('input');
                         }
                     });
                     break;
@@ -125,6 +130,7 @@ $(document).ready(function () {
                         step: 30,
                         onChange: function(value) {
                             $("#poly_text_arc").html(value);
+                            $("#poly_text_arc").trigger('input');
                         }
                     });
                     break;
@@ -135,7 +141,10 @@ $(document).ready(function () {
     $(".color_picker").spectrum({
         preferredFormat: "hex",
         color: "#000000",
-        chooseText: "套用"
+        showButtons: false,
+        change: function(color) {
+            $(this).parent().children('input').trigger("input");
+        }
     });
     /********* !component init ***********/
 
@@ -216,12 +225,26 @@ $(document).ready(function () {
         }
     });
 
+
     $('#point_button').click(function () {
         map.removeInteraction(draw); // remove old brush
         map.removeInteraction(measure_draw);
         clear_helptooltip();
         drawIconText();
     });
+    $("#point_text_size, input[name='point_icon']").change(function () {
+        map.removeInteraction(draw); // remove old brush
+        map.removeInteraction(measure_draw);
+        clear_helptooltip();
+        drawIconText();
+    });
+    $("#point_text_color, #point_text_content, #point_text_arc").on('input', function() {
+        map.removeInteraction(draw); // remove old brush
+        map.removeInteraction(measure_draw);
+        clear_helptooltip();
+        drawIconText();
+    });
+
 
     $('#line_button').click(function () {
         map.removeInteraction(draw); // remove old brush
@@ -229,6 +252,19 @@ $(document).ready(function () {
         clear_helptooltip();
         drawLine();
     });
+    $("#line_text_size, #line_size, input[name='point_icon']").change(function () {
+        map.removeInteraction(draw); // remove old brush
+        map.removeInteraction(measure_draw);
+        clear_helptooltip();
+        drawLine();
+    });
+    $("#line_text_color, #line_color, #line_text_content, #line_text_arc").on('input', function() {
+        map.removeInteraction(draw); // remove old brush
+        map.removeInteraction(measure_draw);
+        clear_helptooltip();
+        drawLine();
+    });
+
 
     $('#poly_button').click(function () {
         map.removeInteraction(draw); // remove old brush
@@ -236,6 +272,19 @@ $(document).ready(function () {
         clear_helptooltip();
         drawPolygon();
     });
+    $("#poly_text_size, #poly_size, #poly_border_size, input[name='point_icon']").change(function () {
+        map.removeInteraction(draw); // remove old brush
+        map.removeInteraction(measure_draw);
+        clear_helptooltip();
+        drawPolygon();
+    });
+    $("#poly_text_color, #poly_line_color, #poly_color, #poly_text_content, #poly_text_arc").on('input', function() {
+        map.removeInteraction(draw); // remove old brush
+        map.removeInteraction(measure_draw);
+        clear_helptooltip();
+        drawPolygon();
+    });
+
 
     /*$('#measure_button').click(function(){
         measure_start();
@@ -259,9 +308,9 @@ $(document).ready(function () {
         map.getView().setZoom(10);
     });
 
-    $(document).on('click', '.edit.button', function () {        
+    $(document).on('click', '.edit.button', function () {
         var feature_id = $(this).parent().siblings("td").first().children("div").text();
-        var feature = featureOverlay.getSource().getFeatureById(feature_id);    
+        var feature = featureOverlay.getSource().getFeatureById(feature_id);
         if (feature_id.split(' ')[0] == "polygon") {
             var coord = feature.getGeometry().getCoordinates()[0][0];
         }else if(feature_id.split(' ')[0] == "line"){
@@ -1123,7 +1172,7 @@ function addInteraction() {
     measure_draw.on('drawstart',
         function(evt) {
 
-            
+
             // set sketch
             sketch = evt.feature;
             /** @type {ol.Coordinate|undefined} */
@@ -1137,7 +1186,7 @@ function addInteraction() {
                 //得到經緯度座標
                 coord = evt.feature.getGeometry().getCoordinates();
                 normalCoord = ol.proj.transform(coord, 'EPSG:3857', 'EPSG:4326')
-                
+
                 //顯示取到四捨五入第四位
                 var size = Math.pow(10, 4);
                 normalCoord[0] = Math.round(normalCoord[0] * size) / size ;
