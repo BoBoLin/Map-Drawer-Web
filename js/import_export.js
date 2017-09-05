@@ -67,6 +67,7 @@ $(document).ready(function () {
             });                       
         }
         // measure layer
+        /*
         var mVectorSource;
         if(measure){
             mVectorSource = measure.getSource();        
@@ -75,6 +76,7 @@ $(document).ready(function () {
                 features.push(feature);
             });
         }
+        */
         var format = new ol.format.KML();
         var kml_str = format.writeFeatures(features);
         if(featureOverlay){
