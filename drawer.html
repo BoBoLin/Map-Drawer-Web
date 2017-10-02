@@ -24,6 +24,7 @@
         <script type="text/javascript" src="js/draw.js"></script>
         <script type="text/javascript" src="js/import_export.js"></script>
         <script type="text/javascript" src="js/share.js"></script>
+        <script type="text/javascript" src="js/FileSaver.min.js"></script>
 
     </head>
     <body>
@@ -206,9 +207,9 @@
                                     </select>
                                 </div>
                                 <div class="fields">
-                                    <div class="eight wide field">
+                                    <!--<div class="eight wide field">
                                         <button class="ui button" id="measure_button">套用</button>
-                                    </div>
+                                    </div>-->
                                     <div class="field">
                                         <button class="ui button" id="measure_clean">清除測量</button>
                                     </div>
@@ -264,8 +265,15 @@
                     E-Mail
                 </button>
 
-            </div>
+                
+
+                </div>
+
+                <div class="title" id="export-png">
+                    Print
+                </div>
         </div>
+    </div>
 
 
     </body>

@@ -221,12 +221,35 @@ $(document).ready(function () {
         }
     });
     map.addInteraction(modify);
+
+    document.getElementById('export-png').addEventListener('click', function() {
+        console.log
+        map.once('postcompose', function(event) {
+            var canvas = event.context.canvas;
+            event.context.textAlign = 'right';
+            event.context.fillText('© My Copyright Text', canvas.width -100, canvas.height - 100);
+            event.context.fillText('© My Copyright Text', canvas.width - 5, canvas.height - 5);
+            canvas.toBlob(function(blob) {
+                saveAs(blob, 'map.png');
+            });
+            //event.context.fillText('', canvas.width -100, canvas.height - 100);
+            //event.context.fillText('', canvas.width - 5, canvas.height - 5);
+        });
+        map.renderSync();
+        map.addControl(new ol.control.Zoom({
+            className: 'custom-zoom'
+        }));
+    
+    });
     /************ !map init *************/
 
     /************ menu button listener ***********/
     $('.secondary.menu > a.item').on('click', function() {
         if( $(this).data("tab") === "one" ){
             map_move_mode();
+        }
+        else if( $(this).data("tab") === "five"){ //measure on change
+            measure_start();
         }
     });
 
@@ -291,9 +314,9 @@ $(document).ready(function () {
     });
 
 
-    $('#measure_button').click(function(){
+    /*$('#measure_button').click(function(){
         measure_start();
-    })
+    })*/
 
     $(document).on('click', '.search.button', function () {
         var feature_id = $(this).parent().siblings("td").first().children("div").text();
@@ -651,15 +674,19 @@ $(document).ready(function () {
     /************ !menu button listener ***********/
 
     /*************** measure *************/
+
+    typeSelect = document.getElementById('type');
+
     /**
     * Let user change the geometry type.
     */
-    //typeSelect.onchange = function() {
-      //  map.removeInteraction(measure_draw);
+    typeSelect.onchange = function() {
+        map.removeInteraction(measure_draw);
         //addInteraction();
-    //};
+        measure_start();
+    };
 
-    typeSelect = document.getElementById('type');
+    //ypeSelect = document.getElementById('type');
 
     function measure_start(){
 
