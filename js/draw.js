@@ -213,6 +213,26 @@ $(document).ready(function () {
         }
     });
     map.addInteraction(modify);
+
+    document.getElementById('export-png').addEventListener('click', function() {
+        console.log
+        map.once('postcompose', function(event) {
+            var canvas = event.context.canvas;
+            event.context.textAlign = 'right';
+            event.context.fillText('© My Copyright Text', canvas.width -100, canvas.height - 100);
+            event.context.fillText('© My Copyright Text', canvas.width - 5, canvas.height - 5);
+            canvas.toBlob(function(blob) {
+                saveAs(blob, 'map.png');
+            });
+            //event.context.fillText('', canvas.width -100, canvas.height - 100);
+            //event.context.fillText('', canvas.width - 5, canvas.height - 5);
+        });
+        map.renderSync();
+        map.addControl(new ol.control.Zoom({
+            className: 'custom-zoom'
+        }));
+    
+    });
     /************ !map init *************/
 
     /************ menu button listener ***********/
