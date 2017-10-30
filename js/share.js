@@ -36,25 +36,62 @@ $(document).ready(function () {
         time = dt.getFullYear() +""+(dt.getMonth()+1) +""+ dt.getDate() +""+dt.getHours() +""+ dt.getMinutes() +""+ dt.getSeconds();
         rand = Math.floor((Math.random() * 100000) + 1);
 
-        var vectorSource = featureOverlay.getSource();
+        var sourceProj = map.getView().getProjection();
+        var vectorSource;
         var features = [];
-        /*****************handle text export*******************/
-        var myTexts = "";
-        vectorSource.forEachFeature(function(feature) {
-            var id = feature.getId();
-            var size = feature.getStyle().getText().getFont().replace("Microsoft Yahei,sans-serif","");;
-            var rotation = feature.getStyle().getText().getRotation();
-            var content = feature.getStyle().getText().getText();
-            if(content.trim()){ // if text is not empty
-                myText = "<myText id=\""+id+"\" size=\""+size+"\" rotation=\""+rotation+"\"></myText>";
-                myTexts += myText;
-            }
-            features.push(feature);
-        });
+        var myTexts = [];
+        if(featureOverlay){
+            vectorSource = featureOverlay.getSource(); 
+            vectorSource.forEachFeature(function(feature) {               
+                feature.setGeometry(feature.getGeometry().clone().transform(sourceProj, 'EPSG:4326') );
+                var text = feature.getStyle().getText().getText();
+                var pos = getPosition(feature);
+                var rotation = feature.getStyle().getText().getRotation();
+                var myText = {text:text,pos:pos,rotation:rotation};
+                myTexts.push(myText);
+                features.push(feature);
+            });                       
+        }
+        // measure layer
+        /*
+        var mVectorSource;
+        if(measure){
+            mVectorSource = measure.getSource();        
+            mVectorSource.forEachFeature(function(feature){
+                feature.setGeometry(feature.getGeometry().clone().transform(sourceProj, 'EPSG:4326') );
+                features.push(feature);
+            });
+        }
+        */
         var format = new ol.format.KML();
-        var string = format.writeFeatures(features);
-        var pos = string.indexOf("</kml>");
-        var kml_s = string.substr(0,pos) + myTexts + "</kml>";
+        var kml_str = format.writeFeatures(features);
+        if(featureOverlay){
+            vectorSource = featureOverlay.getSource(); 
+            vectorSource.forEachFeature(function(feature) {
+                feature.setGeometry(feature.getGeometry().clone().transform('EPSG:4326', sourceProj) );
+            });                       
+        }
+        // measure layer
+        var mVectorSource;
+        if(measure){
+            mVectorSource = measure.getSource();        
+            mVectorSource.forEachFeature(function(feature){
+                feature.setGeometry(feature.getGeometry().clone().transform('EPSG:4326', sourceProj) );
+            });
+        }        
+        var doc = $.parseXML(kml_str);
+        var objs = $(doc).find("Placemark");
+        for(var i=0;i<objs.size();i++){
+            //add empty iconstyle (to prevent have pin.png in google earth)
+            var iconStyleLength = $(objs[i]).find("IconStyle").length;
+            if(iconStyleLength==0){
+                $(objs[i]).find("Style").append("<IconStyle><Icon></Icon></IconStyle>");
+            }
+            // add text rotation
+            var rotation = getRotation(myTexts,objs[i]);
+            $(objs[i]).find("Style").append("<MyRotationStyle>"+rotation+"</MyRotationStyle>");
+        }
+        var kml_s = $(doc).find("kml").prop('outerHTML');
 
         var url = 'http://140.116.245.84/git/Map-Drawer-Web/drawer.html?' + time + "" +rand;
 
@@ -87,25 +124,62 @@ $(document).ready(function () {
         time = dt.getFullYear() +""+(dt.getMonth()+1) +""+ dt.getDate() +""+dt.getHours() +""+ dt.getMinutes() +""+ dt.getSeconds();
         rand = Math.floor((Math.random() * 100000) + 1);
 
-        var vectorSource = featureOverlay.getSource();
+        var sourceProj = map.getView().getProjection();
+        var vectorSource;
         var features = [];
-        /*****************handle text export*******************/
-        var myTexts = "";
-        vectorSource.forEachFeature(function(feature) {
-            var id = feature.getId();
-            var size = feature.getStyle().getText().getFont().replace("Microsoft Yahei,sans-serif","");;
-            var rotation = feature.getStyle().getText().getRotation();
-            var content = feature.getStyle().getText().getText();
-            if(content.trim()){ // if text is not empty
-                myText = "<myText id=\""+id+"\" size=\""+size+"\" rotation=\""+rotation+"\"></myText>";
-                myTexts += myText;
-            }
-            features.push(feature);
-        });
+        var myTexts = [];
+        if(featureOverlay){
+            vectorSource = featureOverlay.getSource(); 
+            vectorSource.forEachFeature(function(feature) {               
+                feature.setGeometry(feature.getGeometry().clone().transform(sourceProj, 'EPSG:4326') );
+                var text = feature.getStyle().getText().getText();
+                var pos = getPosition(feature);
+                var rotation = feature.getStyle().getText().getRotation();
+                var myText = {text:text,pos:pos,rotation:rotation};
+                myTexts.push(myText);
+                features.push(feature);
+            });                       
+        }
+        // measure layer
+        /*
+        var mVectorSource;
+        if(measure){
+            mVectorSource = measure.getSource();        
+            mVectorSource.forEachFeature(function(feature){
+                feature.setGeometry(feature.getGeometry().clone().transform(sourceProj, 'EPSG:4326') );
+                features.push(feature);
+            });
+        }
+        */
         var format = new ol.format.KML();
-        var string = format.writeFeatures(features);
-        var pos = string.indexOf("</kml>");
-        var kml_s = string.substr(0,pos) + myTexts + "</kml>";
+        var kml_str = format.writeFeatures(features);
+        if(featureOverlay){
+            vectorSource = featureOverlay.getSource(); 
+            vectorSource.forEachFeature(function(feature) {
+                feature.setGeometry(feature.getGeometry().clone().transform('EPSG:4326', sourceProj) );
+            });                       
+        }
+        // measure layer
+        var mVectorSource;
+        if(measure){
+            mVectorSource = measure.getSource();        
+            mVectorSource.forEachFeature(function(feature){
+                feature.setGeometry(feature.getGeometry().clone().transform('EPSG:4326', sourceProj) );
+            });
+        }        
+        var doc = $.parseXML(kml_str);
+        var objs = $(doc).find("Placemark");
+        for(var i=0;i<objs.size();i++){
+            //add empty iconstyle (to prevent have pin.png in google earth)
+            var iconStyleLength = $(objs[i]).find("IconStyle").length;
+            if(iconStyleLength==0){
+                $(objs[i]).find("Style").append("<IconStyle><Icon></Icon></IconStyle>");
+            }
+            // add text rotation
+            var rotation = getRotation(myTexts,objs[i]);
+            $(objs[i]).find("Style").append("<MyRotationStyle>"+rotation+"</MyRotationStyle>");
+        }
+        var kml_s = $(doc).find("kml").prop('outerHTML');
 
         var url = 'http://140.116.245.84/git/Map-Drawer-Web/drawer.html?' + time + "" +rand;
         event.preventDefault();
