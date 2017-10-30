@@ -61,12 +61,14 @@ $(document).ready(function () {
                 var text = feature.getStyle().getText().getText();
                 var pos = getPosition(feature);
                 var rotation = feature.getStyle().getText().getRotation();
-                var myText = {text:text,pos:pos,rotation:rotation};
+                var scale = feature.getStyle().getText().getScale();
+                var myText = {text:text,pos:pos,rotation:rotation,scale:scale};
                 myTexts.push(myText);
                 features.push(feature);
             });                       
         }
         // measure layer
+        /*
         var mVectorSource;
         if(measure){
             mVectorSource = measure.getSource();        
@@ -75,6 +77,7 @@ $(document).ready(function () {
                 features.push(feature);
             });
         }
+        */
         var format = new ol.format.KML();
         var kml_str = format.writeFeatures(features);
         if(featureOverlay){
@@ -90,7 +93,7 @@ $(document).ready(function () {
             mVectorSource.forEachFeature(function(feature){
                 feature.setGeometry(feature.getGeometry().clone().transform('EPSG:4326', sourceProj) );
             });
-        }        
+        }       
         var doc = $.parseXML(kml_str);
         var objs = $(doc).find("Placemark");
         for(var i=0;i<objs.size();i++){
@@ -99,9 +102,16 @@ $(document).ready(function () {
             if(iconStyleLength==0){
                 $(objs[i]).find("Style").append("<IconStyle><Icon></Icon></IconStyle>");
             }
+            var textInfo = getTextInfo(myTexts,objs[i]);
+            var rotation = textInfo["rotation"];            
             // add text rotation
-            var rotation = getRotation(myTexts,objs[i]);
             $(objs[i]).find("Style").append("<MyRotationStyle>"+rotation+"</MyRotationStyle>");
+            // add text scale
+            var scale = textInfo["scale"];
+            var labelScaleLength = $(objs[i]).find("LabelStyle").find("scale").length;
+            if(labelScaleLength==0){
+                $(objs[i]).find("LabelStyle").append("<scale>"+scale+"</scale>");
+            }            
         }
         var output = $(doc).find("kml").prop('outerHTML');
         var base64 = btoa(unescape(encodeURIComponent(output)));
@@ -130,14 +140,41 @@ $(document).ready(function () {
 });
 
 function import_kml_string(kml_str) {
-    var rmStartId = featureOverlay.getSource().getFeatures().length;
     var format = new ol.format.KML();
-    featureOverlay.getSource().addFeatures(format.readFeatures(kml_str));
-    featureOverlay.setMap(map);    
-    var features = featureOverlay.getSource().getFeatures();
-    for(i = rmStartId;i<features.length;i++){ // remove previous kml id to prevent error (don not remove id in the map)
-        features[i].setId("undefined "+i);
-    }
+    var importFeature = format.readFeatures(kml_str);
+    for(var i=0;i<importFeature.length;i++){
+        var oldId = importFeature[i].getId();
+        var draw_type = oldId.split(" ")[0];
+        var newId = draw_type+" "+$cnt;
+        // make feature editable
+        importFeature[i].setId(newId);
+        // add to editor
+        $("#editor > tbody").append(
+            "<tr>" +
+                "<td>" +
+                    "<h2 class='ui center aligned header'>" + $cnt + "</h2>" +
+                    "<div style='display: none;'>" + (draw_type + " " + $cnt) + "</div>" +
+                "</td>" +
+                "<td>" +
+                    "<i class='" + ((draw_type=="line")? "arrow left" : (draw_type=="polygon")? "square outline" : (draw_type=="warning_sign")? "warning sign" : draw_type) + " icon'></i>" +
+                    "(" + text_content + ")" +
+                "</td>" +
+                "<td>" +
+                    "<button class='ui icon search button'><i class='search icon'></i></button>" +
+                "</td>" +
+                "<td>" +
+                    "<button class='ui icon edit button'><i class='edit icon'></i></button>" +
+                "</td>" +
+                "<td>" +
+                    "<button class='ui icon remove button'><i class='remove icon'></i></button>" +
+                "</td>" +
+            "</tr>"
+        );  
+        $cnt ++; //global variable in draw.js              
+        featureOverlay.getSource().addFeature(importFeature[i]);
+    }   
+    featureOverlay.setMap(map);  
+
     var doc = $.parseXML(kml_str);
     var objs = $(doc).find("Placemark");
     var isGE = $(doc).find("StyleMap").length; // if true, then file from google earth 
@@ -164,40 +201,11 @@ function import_kml_string(kml_str) {
         var features = featureOverlay.getSource().getFeatures();
         var feature = getFeatureByCoor(features,coorXYarr); 
         var s = getMyKMLstyle();
-        feature.setStyle(s);       
-        // make feature editable
-        var draw_type = getDrawType(type);
-        feature.setId(draw_type+" "+$cnt);
-        // add to editor
-        $("#editor > tbody").append(
-            "<tr>" +
-                "<td>" +
-                    "<h2 class='ui center aligned header'>" + $cnt + "</h2>" +
-                    "<div style='display: none;'>" + (draw_type + " " + $cnt) + "</div>" +
-                "</td>" +
-                "<td>" +
-                    "<i class='" + ((draw_type=="line")? "arrow left" : (draw_type=="polygon")? "square outline" : (draw_type=="warning_sign")? "warning sign" : draw_type) + " icon'></i>" +
-                    "(" + text_content + ")" +
-                "</td>" +
-                "<td>" +
-                    "<button class='ui icon search button'><i class='search icon'></i></button>" +
-                "</td>" +
-                "<td>" +
-                    "<button class='ui icon edit button'><i class='edit icon'></i></button>" +
-                "</td>" +
-                "<td>" +
-                    "<button class='ui icon remove button'><i class='remove icon'></i></button>" +
-                "</td>" +
-            "</tr>"
-        );  
-        $cnt ++; //global variable in draw.js      
-    }
-    // transform projection of features     
-    var sourceProj = map.getView().getProjection();
-    vectorSource = featureOverlay.getSource(); 
-    vectorSource.forEachFeature(function(feature) {
-        feature.setGeometry(feature.getGeometry().clone().transform('EPSG:4326', sourceProj) );
-    });    
+        feature.setStyle(s);   
+        // transform projection of features     
+        var sourceProj = map.getView().getProjection();           
+        feature.setGeometry(feature.getGeometry().clone().transform('EPSG:4326', sourceProj) ); 
+    }  
     // draw on map
     var load_interaction = new ol.interaction.Modify({
         features: new ol.Collection(featureOverlay.getSource().getFeatures())
@@ -205,8 +213,10 @@ function import_kml_string(kml_str) {
     map.addInteraction(load_interaction);
 }
 
-function getRotation(myTexts,obj){
+function getTextInfo(myTexts,obj){
     var rotation = 0;
+    var scale = 1;
+    var textInfo = {};
     for1:for(var i=0;i<myTexts.length;i++){
         var text = $(obj).find("name").text();
         if(text!=myTexts[i]["text"]){ // check text
@@ -231,8 +241,11 @@ function getRotation(myTexts,obj){
             }
         }
         rotation = myTexts[i]["rotation"];
+        scale = myTexts[i]["scale"];
+        textInfo = {rotation:rotation,scale:scale};
+        return textInfo; 
     }  
-    return rotation;      
+         
 }
 
 function getStyleId(isGE,doc,obj){
@@ -278,7 +291,7 @@ function getCoorXYarr(coorstr){
 
 function getFeatureByCoor(features,coorXYarr){
     for2: for(var i=0;i<features.length;i++){      
-        var fCoor = getPosition(features[i]);   
+        var fCoor = getPosition(features[i]); 
         if(fCoor.length!=coorXYarr.length){
             continue;
         }
@@ -292,7 +305,6 @@ function getFeatureByCoor(features,coorXYarr){
         }
         return features[i];
     }
-    console.log("no return");
 }
 
 function getPosition(feature){
