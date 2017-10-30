@@ -1,0 +1,142 @@
+<html>
+    <head>
+        <title>Clustered Features</title>
+        <script src="./js/jquery-1.12.1.min.js"></script>
+        <script src="./js/ol.js"></script>
+        <link rel="stylesheet" href="./css/ol.css" type="text/css">
+        <script>
+            var data;
+            var map;
+            var raster;
+            $(document).ready(function () {
+                raster = new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                });
+                map = new ol.Map({
+                    layers: [raster],
+                    target: 'map',
+                    view: new ol.View({
+                        center: ol.proj.transform([120.2167, 24.00], 'EPSG:4326', 'EPSG:3857'),
+                        zoom: 7
+                    })
+                });
+
+                map.on('click', function(evt) {
+                    var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) { return feature; });
+                    if(feature){
+                        if(typeof feature.get('features') === 'undefined'){
+                            // not a cluster
+                        }else{
+                            // is a cluster, so loop through all the underlying features
+                            // Note even if cluster only contain 1 node, it's still cluster
+                            var features = feature.get('features');
+                            var str = "";
+                            for(var i = 0; i < features.length; i++) {
+                                // here you'll have access to your normal attributes:
+                                //console.log(features[i].get('id')+" "+features[i].get('product')+" "+features[i].get('image'));
+                                str += "<"+i+"> " + features[i].get('id')+" "+features[i].get('product')+" "+features[i].get('image') + "\n";
+                            }
+                            alert(str);
+                        }
+                    }
+                });
+
+                $("#send").click(function () {
+                    $.ajax({type: "POST", dataType: "xml", url:"http://140.116.245.65/LLGIS_20171023/2.php",
+                        data:{
+                            date_from:20130315,date_to:20171006,
+                            space_sel:"space_city",
+                            city_column1:"臺南市",
+                            city_column2:"",
+                            city_column3:"",
+                            Search_In_drawbox_LU_X:"120.60001",
+                            Search_In_drawbox_LU_Y:"23.780000",
+                            Search_In_drawbox_RD_X:"121.74001",
+                            Search_In_drawbox_RD_Y:"22.740045"
+                        },
+                        success: function(response){
+                            //console.log(response);
+                            data = response;
+                            draw_cluster(response);
+                        },
+                        error: function(e){
+                            console.log(e.message);
+                        }
+                    });
+                });
+            });
+
+            function draw_cluster(xml) {
+                var $item = $(xml).find("row");
+                var features = new Array($item.length);
+                var i = 0;
+                $item.each(function() {
+                    var coordinates = ol.proj.transform(parse_lnglat( $(this).attr("id") ), 'EPSG:4326', 'EPSG:3857');
+                    features[i] = new ol.Feature({
+                        id: $(this).attr("id"),
+                        location: $(this).children("cell:nth-child(2)").text(),
+                        product: $(this).children("cell:nth-child(3)").text(),
+                        image: $(this).children("cell:nth-child(4)").text(),
+                        time: $(this).children("cell:nth-child(9)").text()+" "+$(this).children("cell:nth-child(10)").text()+" "+$(this).children("cell:nth-child(11)").text(),
+                        geometry: new ol.geom.Point(coordinates)
+                    });
+                    i++;
+                });
+
+                var source = new ol.source.Vector({
+                    features: features
+                });
+
+                var distance = 50;
+                var clusterSource = new ol.source.Cluster({
+                    distance: parseInt(distance, 10),
+                    source: source
+                });
+
+                var styleCache = {};
+                var clusters = new ol.layer.Vector({
+                    source: clusterSource,
+                    style: function(feature) {
+                        var size = feature.get('features').length;
+                        var style = styleCache[size];
+                        if (!style) {
+                            style = new ol.style.Style({
+                                image: new ol.style.Circle({
+                                    radius: 10,
+                                    stroke: new ol.style.Stroke({
+                                      color: '#fff'
+                                    }),
+                                    fill: new ol.style.Fill({
+                                      color: '#3399CC'
+                                    })
+                                }),
+                                text: new ol.style.Text({
+                                    text: size.toString(),
+                                    fill: new ol.style.Fill({
+                                      color: '#fff'
+                                    })
+                                })
+                            });
+                            styleCache[size] = style;
+                        }
+                        return style;
+                    }
+                });
+
+                map.addLayer(clusters);
+            }
+
+            function parse_lnglat(str){
+                var substr = str.split(";");
+                return [parseFloat(substr[1]), parseFloat(substr[0])];
+            }
+        </script>
+    </head>
+    <body>
+        <div>
+            <div id="map" class="map"></div>
+            <button style="position: absolute; bottom: 30px; right: 50px; height: 100px; width: 200px;" id="send">Send</button>
+        </div>
+    </body>
+</html>
+
